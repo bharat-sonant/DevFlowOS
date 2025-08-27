@@ -1,0 +1,40 @@
+# Node & package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+.turbo/
+.next/
+
+# Prisma generated stuff
+*.db
+*.sqlite
+*.db-journal
+apps/api/node_modules/.prisma/
+apps/api/node_modules/@prisma/
+
+# Env files
+.env
+apps/**/.env
+packages/**/.env
+
+# TS build cache
+*.tsbuildinfo
+
+# VSCode
+.vscode/
+.idea/
+.DS_Store
+
+# expo
+.expo
+.expo-shared
+
+# OS noise
+.DS_Store
+Thumbs.db

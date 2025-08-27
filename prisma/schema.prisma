@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./node_modules/.prisma/client"
+}
+
+generator nestjsDto {
+  provider = "prisma-generator-nestjs-dto"
+  output   = "../../../packages/shared/src/models"
+  outputToNestJsResourceStructure  = true    // (script handles either true/false)
+  baseDto                          = true
+  classValidation                  = true
+  dtoSuffix                        = "Dto"
+  entitySuffix                     = "Entity"
+  separateEntityFiles              = true
+  separateDtoFiles                 = true
+  outputDtos                       = "dtos"
+  outputEntities                   = "entities"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
