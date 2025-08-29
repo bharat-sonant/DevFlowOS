@@ -1,0 +1,9 @@
+model companies {
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code       String
+  name       String
+  full_name  String?
+  email      String      @unique @db.Citext
+  created_at DateTime    @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  employees  employees[]
+}

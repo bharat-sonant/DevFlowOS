@@ -8,5 +8,8 @@
     "clean": "rm -rf dist",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write src"
+  },
+  "dependencies": {
+    "@om/shared": "workspace:*"
   }
 }
