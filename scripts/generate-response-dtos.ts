@@ -1,71 +1,78 @@
-import { Project } from "ts-morph";
-import fs from "fs";
-import path from "path";
+import { Project, SourceFile, ClassDeclaration, PropertyDeclaration } from "ts-morph";
+import { writeFileSync, readdirSync, statSync, unlinkSync } from "fs";
+import { join, dirname } from "path";
+
+const modelsDir = join(__dirname, "../packages/shared/src/models");
 
 const project = new Project({
-  tsConfigFilePath: "packages/shared/tsconfig.json",
+  tsConfigFilePath: "packages/shared/tsconfig.json", // ensure this file exists or adjust path
 });
 
-// base folder where DTOs are generated
-const baseDir = path.resolve("packages/shared/src/models");
+// path to your shared omit-fields file
+const OMIT_IMPORT_PATH = "@shared/utils/omit-fields";
 
-// Step 1: Generate Response DTOs
 function generateResponseDtos() {
-  project.getSourceFiles().forEach((file) => {
-    file.getClasses().forEach((cls) => {
-      const className = cls.getName();
-      if (!className) return;
+  const project = new Project();
+  project.addSourceFilesAtPaths(`${modelsDir}/**/entities/*.ts`);
 
-      // only for "*Entity" classes
-      if (!className.endsWith("Entity")) return;
+  project.getSourceFiles().forEach((file: SourceFile) => {
+    file.getClasses().forEach((cls: ClassDeclaration) => {
+      const entityName = cls.getName();
+      if (!entityName) return;
 
-      const entityName = className.replace("Entity", "");
-      const responseDtoName = `${entityName}ResponseDto`;
+      const baseName = entityName.replace(/Entity$/, "");
+      const responseDtoName = `${baseName}ResponseDto`;
 
-      const dtoFilePath = path.join(
-        path.dirname(file.getFilePath()),
-        "..",
-        "dto",
-        `${entityName.toLowerCase()}.response.dto.ts`
-      );
+      // 🔹 Collect relation fields dynamically
+      const relationFields: string[] = [];
+      cls.getProperties().forEach((prop: PropertyDeclaration) => {
+        const typeNode = prop.getTypeNode();
+        if (!typeNode) return;
 
-      // skip if already exists
-      if (fs.existsSync(dtoFilePath)) return;
-
-      // create a new source file for Response DTO
-      const dtoFile = project.createSourceFile(dtoFilePath, "", { overwrite: true });
-      const dtoClass = dtoFile.addClass({ name: responseDtoName, isExported: true });
-
-      // copy all props
-      cls.getProperties().forEach((prop) => {
-        dtoClass.addProperty({
-          name: prop.getName(),
-          type: prop.getType().getText(),
-          hasQuestionToken: prop.hasQuestionToken(),
-        });
+        const text = typeNode.getText();
+        if (text.endsWith("Entity") || text.includes("Entity[]")) {
+          relationFields.push(prop.getName());
+        }
       });
 
-      console.log(`Generated response DTO: ${dtoFilePath}`);
+      // 🔹 Deduplicate relation fields against STANDARD_OMIT
+      const uniqueRelations = Array.from(new Set(relationFields));
+
+      const dtoFilePath = file.getFilePath()
+        .replace("/entities/", "/dto/")
+        .replace(".entity.ts", ".response.dto.ts");
+
+      const content = `import { OmitType } from '@nestjs/mapped-types';
+import { ${entityName} } from '../entities/${baseName.toLowerCase()}.entity';
+import { STANDARD_OMIT } from '${OMIT_IMPORT_PATH}';
+
+export class ${responseDtoName} extends OmitType(
+  ${entityName} as any,
+  [...STANDARD_OMIT${uniqueRelations.length ? `, ${uniqueRelations.map(f => `"${f}"`).join(", ")}` : ""}] as const
+) {}
+`;
+
+      writeFileSync(dtoFilePath, content, { flag: "w" });
+      console.log(`Generated ${responseDtoName}`);
     });
   });
 }
 
-// Step 2: Delete all connect-*.dto.ts files
+// --- Delete all connect-*.dto.ts
 function deleteConnectDtos(dir: string) {
-  fs.readdirSync(dir).forEach((file) => {
-    const fullPath = path.join(dir, file);
-    if (fs.statSync(fullPath).isDirectory()) {
+  readdirSync(dir).forEach((file) => {
+    const fullPath = join(dir, file);
+    if (statSync(fullPath).isDirectory()) {
       deleteConnectDtos(fullPath);
     } else if (file.startsWith("connect-") && file.endsWith(".dto.ts")) {
-      console.log(`Removing: ${fullPath}`);
-      fs.unlinkSync(fullPath);
+      console.log(`🗑 Removing: ${fullPath}`);
+      unlinkSync(fullPath);
     }
   });
 }
 
-// run steps
+// --- Run everything
 generateResponseDtos();
-deleteConnectDtos(baseDir);
+deleteConnectDtos(modelsDir);
 
-// finally save project changes
 project.save().then(() => console.log("DTO generation + cleanup completed!"));
