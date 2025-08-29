@@ -35,7 +35,7 @@ function processFile(filePath: string) {
   );
 
   fs.writeFileSync(filePath, content, "utf8");
-  console.log(`✔ Cleaned ${filePath}`);
+  console.log(`Cleaned ${filePath}`);
 }
 
 walk(MODELS_DIR, processFile);

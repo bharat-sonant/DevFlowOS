@@ -12,8 +12,9 @@ function pascalCase(name: string): string {
 }
 
 function generateFiles(modelName: string, modelFileName: string, idType: string, baseFolder: string, folder: string) {
-  // ---------- Service ----------
-  const serviceContent = `import { Injectable } from "@nestjs/common";
+  // ---------- Base Service ----------
+  const baseService = `
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../prisma/prisma.service";
 import { Create${modelName}Dto, Update${modelName}Dto, ${modelName}ResponseDto } from "@om/shared";
 
@@ -22,81 +23,108 @@ export class ${modelName}ServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
   async create(data: Create${modelName}Dto): Promise<${modelName}ResponseDto> {
-    return this.prisma.${modelFileName}.create({ data });
+    const created = await this.prisma.${modelFileName}.create({ data });
+    return created as unknown as ${modelName}ResponseDto;
   }
 
   async findMany(): Promise<${modelName}ResponseDto[]> {
-    return this.prisma.${modelFileName}.findMany();
+    return this.prisma.${modelFileName}.findMany() as unknown as ${modelName}ResponseDto[];
   }
 
   async findOne(id: ${idType}): Promise<${modelName}ResponseDto | null> {
-    return this.prisma.${modelFileName}.findUnique({ where: { id } });
+    return this.prisma.${modelFileName}.findUnique({ where: { id } }) as unknown as ${modelName}ResponseDto;
   }
 
   async update(id: ${idType}, data: Update${modelName}Dto): Promise<${modelName}ResponseDto> {
-    return this.prisma.${modelFileName}.update({ where: { id }, data });
+    return this.prisma.${modelFileName}.update({ where: { id }, data }) as unknown as ${modelName}ResponseDto;
   }
 
   async remove(id: ${idType}): Promise<${modelName}ResponseDto> {
-    return this.prisma.${modelFileName}.delete({ where: { id } });
+    return this.prisma.${modelFileName}.delete({ where: { id } }) as unknown as ${modelName}ResponseDto;
   }
 }
 `;
+  fs.writeFileSync(path.join(baseFolder, `${modelFileName}.service.base.ts`), baseService);
 
-  fs.writeFileSync(path.join(baseFolder, `${modelFileName}.service.base.ts`), serviceContent);
-
-  // ---------- Controller ----------
-  const controllerContent = `import { Controller, Get, Post, Body, Param, Delete, Put } from "@nestjs/common";
+  // ---------- Base Controller ----------
+  const baseController = `
+import { Controller, Get, Post, Put, Delete, Body, Param } from "@nestjs/common";
 import { ${modelName}ServiceBase } from "./${modelFileName}.service.base";
-import { Create${modelName}Dto, Update${modelName}Dto } from "@om/shared";
+import { Create${modelName}Dto, Update${modelName}Dto, ${modelName}ResponseDto } from "@om/shared";
 
 @Controller("${modelFileName}")
 export class ${modelName}ControllerBase {
-  constructor(private readonly service: ${modelName}ServiceBase) {}
+  constructor(protected readonly service: ${modelName}ServiceBase) {}
 
   @Post()
-  create(@Body() data: Create${modelName}Dto) {
+  async create(@Body() data: Create${modelName}Dto): Promise<${modelName}ResponseDto> {
     return this.service.create(data);
   }
 
   @Get()
-  findMany() {
+  async findMany(): Promise<${modelName}ResponseDto[]> {
     return this.service.findMany();
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
+  async findOne(@Param("id") id: ${idType}): Promise<${modelName}ResponseDto | null> {
     return this.service.findOne(id);
   }
 
   @Put(":id")
-  update(@Param("id") id: string, @Body() data: Update${modelName}Dto) {
+  async update(@Param("id") id: ${idType}, @Body() data: Update${modelName}Dto): Promise<${modelName}ResponseDto> {
     return this.service.update(id, data);
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string) {
+  async remove(@Param("id") id: ${idType}): Promise<${modelName}ResponseDto> {
     return this.service.remove(id);
   }
 }
 `;
+  fs.writeFileSync(path.join(baseFolder, `${modelFileName}.controller.base.ts`), baseController);
 
-  fs.writeFileSync(path.join(baseFolder, `${modelFileName}.controller.base.ts`), controllerContent);
+  // ---------- Extended Service ----------
+  const service = `
+import { Injectable } from "@nestjs/common";
+import { ${modelName}ServiceBase } from "./base/${modelFileName}.service.base";
+
+@Injectable()
+export class ${modelName}Service extends ${modelName}ServiceBase {}
+`;
+  fs.writeFileSync(path.join(folder, `${modelFileName}.service.ts`), service);
+
+  // ---------- Extended Controller ----------
+  const controller = `
+import { Controller } from "@nestjs/common";
+import { ${modelName}ControllerBase } from "./base/${modelFileName}.controller.base";
+import { ${modelName}Service } from "./${modelFileName}.service";
+
+@Controller("${modelFileName}")
+export class ${modelName}Controller extends ${modelName}ControllerBase {
+  constructor(protected readonly service: ${modelName}Service) {
+    super(service);
+  }
+}
+`;
+  fs.writeFileSync(path.join(folder, `${modelFileName}.controller.ts`), controller);
 
   // ---------- Module ----------
-  const moduleContent = `import { Module } from "@nestjs/common";
+  const moduleContent = `
+import { Module } from "@nestjs/common";
+import { PrismaService } from "../../../prisma/prisma.service";
 import { ${modelName}ServiceBase } from "./base/${modelFileName}.service.base";
 import { ${modelName}ControllerBase } from "./base/${modelFileName}.controller.base";
-import { PrismaService } from "../../../prisma/prisma.service";
+import { ${modelName}Service } from "./${modelFileName}.service";
+import { ${modelName}Controller } from "./${modelFileName}.controller";
 
 @Module({
-  controllers: [${modelName}ControllerBase],
-  providers: [${modelName}ServiceBase, PrismaService],
-  exports: [${modelName}ServiceBase],
+  controllers: [${modelName}Controller],
+  providers: [${modelName}Service, ${modelName}ServiceBase, PrismaService],
+  exports: [${modelName}Service],
 })
 export class ${modelName}Module {}
 `;
-
   fs.writeFileSync(path.join(folder, `${modelFileName}.module.ts`), moduleContent);
 }
 
@@ -128,7 +156,7 @@ function main() {
         }
       }
 
-      console.log(`⚙️ Generating module for model: ${modelName} from ${file}`);
+      console.log(`Generating module for model: ${modelName} from ${file}`);
 
       const folder = path.resolve(modulesRoot, modelFileName);
       const baseFolder = path.join(folder, "base");
@@ -138,7 +166,7 @@ function main() {
     }
   }
 
-  console.log("All modules generated from separate .prisma files.");
+  console.log("All modules generated with base + extended structure.");
 }
 
 main();

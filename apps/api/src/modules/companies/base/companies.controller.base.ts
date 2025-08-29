@@ -1,33 +1,34 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from "@nestjs/common";
+
+import { Controller, Get, Post, Put, Delete, Body, Param } from "@nestjs/common";
 import { CompaniesServiceBase } from "./companies.service.base";
-import { CreateCompaniesDto, UpdateCompaniesDto } from "@om/shared";
+import { CreateCompaniesDto, UpdateCompaniesDto, CompaniesResponseDto } from "@om/shared";
 
 @Controller("companies")
 export class CompaniesControllerBase {
-  constructor(private readonly service: CompaniesServiceBase) {}
+  constructor(protected readonly service: CompaniesServiceBase) {}
 
   @Post()
-  create(@Body() data: CreateCompaniesDto) {
+  async create(@Body() data: CreateCompaniesDto): Promise<CompaniesResponseDto> {
     return this.service.create(data);
   }
 
   @Get()
-  findMany() {
+  async findMany(): Promise<CompaniesResponseDto[]> {
     return this.service.findMany();
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
+  async findOne(@Param("id") id: string): Promise<CompaniesResponseDto | null> {
     return this.service.findOne(id);
   }
 
   @Put(":id")
-  update(@Param("id") id: string, @Body() data: UpdateCompaniesDto) {
+  async update(@Param("id") id: string, @Body() data: UpdateCompaniesDto): Promise<CompaniesResponseDto> {
     return this.service.update(id, data);
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string) {
+  async remove(@Param("id") id: string): Promise<CompaniesResponseDto> {
     return this.service.remove(id);
   }
 }
