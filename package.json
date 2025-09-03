@@ -7,7 +7,7 @@
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",
     "prisma": "prisma",
-    "generate:api": "setx PRISMA_CLIENT_ENGINE_TYPE binary && dotenv -e apps/api/prisma/.env -- npx prisma db pull --schema ./apps/api/prisma/schema.prisma && prisma generate --schema ./apps/api/prisma/schema.prisma && tsx scripts/split-prisma.ts && node scripts/rearrange-dtos-entities.js && tsx scripts/generate-modules.ts && ts-node --compiler-options \"{\\\"module\\\":\\\"CommonJS\\\"}\" scripts/generate-response-dtos.ts && tsx scripts/cleanup-dtos.ts && prettier --write \"packages/shared/src/models/**/*.{ts,tsx}\"",
+    "generate:api": "setx PRISMA_CLIENT_ENGINE_TYPE binary && dotenv -e apps/api/prisma/.env -- npx prisma db pull --schema ./apps/api/prisma/schema.prisma && prisma generate --schema ./apps/api/prisma/schema.prisma && tsx scripts/split-prisma.ts && tsx scripts/generate-modules.ts && ts-node --compiler-options \"{\\\"module\\\":\\\"CommonJS\\\"}\" scripts/generate-response-dtos.ts && tsx scripts/cleanup-dtos.ts && prettier --write \"packages/shared/src/models/**/*.{ts,tsx}\"",
     "db:pull:api": "setx PRISMA_CLIENT_ENGINE_TYPE binary && dotenv -e apps/api/prisma/.env -- npx prisma db pull --schema=apps/api/prisma/schema.prisma",
     "dev:web": "pnpm --filter web dev",
     "dev:mobile": "pnpm --filter mobile start",

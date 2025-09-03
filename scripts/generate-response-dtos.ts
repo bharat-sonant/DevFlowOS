@@ -65,7 +65,7 @@ function deleteConnectDtos(dir: string) {
     if (statSync(fullPath).isDirectory()) {
       deleteConnectDtos(fullPath);
     } else if (file.startsWith("connect-") && file.endsWith(".dto.ts")) {
-      console.log(`🗑 Removing: ${fullPath}`);
+      console.log(`Removing: ${fullPath}`);
       unlinkSync(fullPath);
     }
   });
