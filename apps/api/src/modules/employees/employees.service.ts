@@ -1,6 +1,6 @@
 
-import { Injectable } from '@nestjs/common';
-import { employeesServiceBase } from './base/employees.service.base';
+import { Injectable } from "@nestjs/common";
+import { EmployeesServiceBase } from "./base/employees.service.base";
 
 @Injectable()
-export class employeesService extends employeesServiceBase {}
+export class EmployeesService extends EmployeesServiceBase {}

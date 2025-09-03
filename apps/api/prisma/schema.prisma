@@ -1,56 +1,31 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./node_modules/.prisma/client"
+  output   = "../node_modules/.prisma/client"
 }
 
 generator nestjsDto {
   provider                        = "prisma-generator-nestjs-dto"
   output                          = "../../../packages/shared/src/models"
+  addExplicitDefaults             = "true"
   baseDto                         = "true"
-  classValidation                 = "true"
+  classValidation                 = "false"
+  decorateEntities                = "false"
+  disableSwaggerDecorators        = "true"
   dtoSuffix                       = "Dto"
   entitySuffix                    = "Entity"
+  generateRelations               = "false"
+  generateResponseDto             = "true"
+  outputDtoTypes                  = ["create", "update"]
   outputDtos                      = "dtos"
   outputEntities                  = "entities"
   outputToNestJsResourceStructure = "true"
   separateDtoFiles                = "true"
   separateEntityFiles             = "true"
+  swagger                         = "false"
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-}
-
-model companies {
-  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code       String
-  name       String
-  full_name  String?
-  email      String      @unique @db.Citext
-  created_at DateTime    @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
-  employees  employees[]
-}
-
-model employees {
-  id                                              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  company_id                                      String      @db.Uuid
-  employee_code                                   String
-  name                                            String
-  email                                           String      @db.Citext
-  password                                        String
-  status                                          Int         @default(1)
-  is_owner                                        Boolean     @default(false)
-  created_at                                      DateTime    @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
-  created_by                                      String      @db.Uuid
-  updated_at                                      DateTime?   @db.Timestamptz(6)
-  updated_by                                      String?     @db.Uuid
-  companies                                       companies   @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  employees_employees_created_byToemployees       employees   @relation("employees_created_byToemployees", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  other_employees_employees_created_byToemployees employees[] @relation("employees_created_byToemployees")
-  employees_employees_updated_byToemployees       employees?  @relation("employees_updated_byToemployees", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  other_employees_employees_updated_byToemployees employees[] @relation("employees_updated_byToemployees")
-
-  @@unique([company_id, email], map: "unique_company_employee_email")
 }
