@@ -1,7 +1,7 @@
 model employees {
   id                                              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   company_id                                      String      @db.Uuid
-  employee_code                                   String
+  employee_code                                   String      @db.Citext
   name                                            String
   email                                           String      @db.Citext
   password                                        String
@@ -17,5 +17,6 @@ model employees {
   employees_employees_updated_byToemployees       employees?  @relation("employees_updated_byToemployees", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   other_employees_employees_updated_byToemployees employees[] @relation("employees_updated_byToemployees")
 
+  @@unique([company_id, employee_code], map: "unique_company_employee_code")
   @@unique([company_id, email], map: "unique_company_employee_email")
 }

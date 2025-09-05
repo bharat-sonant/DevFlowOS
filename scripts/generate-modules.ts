@@ -85,16 +85,23 @@ export class ${modelName}ControllerBase {
   fs.writeFileSync(path.join(baseFolder, `${modelFileName}.controller.base.ts`), baseController);
 
   // ---------- Extended Service ----------
+const servicePath = path.join(folder, `${modelFileName}.service.ts`);
+if (!fs.existsSync(servicePath)) {
   const service = `
 import { Injectable } from "@nestjs/common";
 import { ${modelName}ServiceBase } from "./base/${modelFileName}.service.base";
 
 @Injectable()
-export class ${modelName}Service extends ${modelName}ServiceBase {}
+export class ${modelName}Service extends ${modelName}ServiceBase {
+  // Add custom business logic here
+}
 `;
-  fs.writeFileSync(path.join(folder, `${modelFileName}.service.ts`), service);
+  fs.writeFileSync(servicePath, service);
+}
 
   // ---------- Extended Controller ----------
+const controllerPath = path.join(folder, `${modelFileName}.controller.ts`);
+if (!fs.existsSync(controllerPath)) {
   const controller = `
 import { Controller } from "@nestjs/common";
 import { ${modelName}ControllerBase } from "./base/${modelFileName}.controller.base";
@@ -105,9 +112,12 @@ export class ${modelName}Controller extends ${modelName}ControllerBase {
   constructor(protected readonly service: ${modelName}Service) {
     super(service);
   }
+
+  // ✅ Add custom endpoints here
 }
 `;
-  fs.writeFileSync(path.join(folder, `${modelFileName}.controller.ts`), controller);
+  fs.writeFileSync(controllerPath, controller);
+}
 
   // ---------- Module ----------
   const moduleContent = `

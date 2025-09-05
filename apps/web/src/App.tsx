@@ -1,12 +1,31 @@
-import React from "react";
+import { Routes, Route, NavLink, Navigate } from 'react-router-dom'
+import CompaniesPage from './pages/CompaniesPage'
 
-function App() {
+export default function App() {
   return (
-    <div className="container mt-5">
-      <h1 className="text-primary">React + Bootstrap + TS Skeleton</h1>
-      <p>Welcome to the web app skeleton!</p>
-    </div>
-  );
-}
+    <div>
+      <nav className="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+        <div className="container">
+          <a className="navbar-brand fw-semibold" href="#">TaskMgmt</a>
 
-export default App;
+          <div className="collapse navbar-collapse">
+            <ul className="navbar-nav me-auto">
+              <li className="nav-item">
+                <NavLink to="/companies" className="nav-link">
+                  Companies
+                </NavLink>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <main className="container py-4">
+        <Routes>
+          <Route path="/" element={<Navigate to="/companies" replace />} />
+          <Route path="/companies" element={<CompaniesPage />} />
+        </Routes>
+      </main>
+    </div>
+  )
+}
