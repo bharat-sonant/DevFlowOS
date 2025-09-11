@@ -1,10 +1,11 @@
 import { Routes, Route, NavLink, Navigate } from 'react-router-dom'
 import CompaniesPage from './pages/CompaniesPage'
+import EmailVerificationPage from './pages/EmailVerificationPage/EmailVerificationPage '
 
 export default function App() {
   return (
     <div>
-      <nav className="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+      {/* <nav className="navbar navbar-expand-lg bg-body-tertiary border-bottom">
         <div className="container">
           <a className="navbar-brand fw-semibold" href="#">TaskMgmt</a>
 
@@ -18,12 +19,13 @@ export default function App() {
             </ul>
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       <main className="container py-4">
         <Routes>
           <Route path="/" element={<Navigate to="/companies" replace />} />
           <Route path="/companies" element={<CompaniesPage />} />
+          <Route path='/emailVerification' element={<EmailVerificationPage/>}/>
         </Routes>
       </main>
     </div>
