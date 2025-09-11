@@ -1,6 +1,8 @@
 import { Routes, Route, NavLink, Navigate } from 'react-router-dom'
 import CompaniesPage from './pages/CompaniesPage'
 import EmailVerificationPage from './pages/EmailVerificationPage/EmailVerificationPage '
+import RegistrationForm from './pages/registration-form/RegistrationForm'
+import LoginPage from './pages/login-page/LoginPage'
 
 export default function App() {
   return (
@@ -26,6 +28,8 @@ export default function App() {
           <Route path="/" element={<Navigate to="/companies" replace />} />
           <Route path="/companies" element={<CompaniesPage />} />
           <Route path='/emailVerification' element={<EmailVerificationPage/>}/>
+          <Route path='/registrationForm' element={<RegistrationForm/>}/>
+          <Route path='/login' element={<LoginPage/>}/>
         </Routes>
       </main>
     </div>
