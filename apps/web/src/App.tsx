@@ -1,5 +1,6 @@
 import { Routes, Route, NavLink, Navigate } from 'react-router-dom'
 import CompaniesPage from './pages/CompaniesPage'
+import CompanyRegistrationPage from './pages/company-registration/CompanyRegistration'
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/companies" replace />} />
           <Route path="/companies" element={<CompaniesPage />} />
+           <Route path="/register-company" element={<CompanyRegistrationPage/>}/>
         </Routes>
       </main>
     </div>
