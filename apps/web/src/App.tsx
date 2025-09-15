@@ -3,7 +3,9 @@ import CompaniesPage from './pages/CompaniesPage'
 import CompanyRegistrationPage from './pages/company-registration/CompanyRegistration'
 import EmailVerificationPage from './pages/EmailVerificationPage/EmailVerificationPage '
 import RegistrationForm from './pages/registration-form/RegistrationForm'
-import LoginPage from './pages/login-page/LoginPage'
+import LoginPage from './pages/login-page/CompanyCodeScreen'
+import CompanyCodeScreen from './pages/login-page/CompanyCodeScreen'
+import LoginScreen from './pages/login-page/LoginScreen'
 
 export default function App() {
   return (
@@ -31,7 +33,8 @@ export default function App() {
            <Route path="/register-company" element={<CompanyRegistrationPage/>}/>
           <Route path='/emailVerification' element={<EmailVerificationPage/>}/>
           <Route path='/registrationForm' element={<RegistrationForm/>}/>
-          <Route path='/login' element={<LoginPage/>}/>
+          <Route path='/companyCodeScreen' element={<CompanyCodeScreen/>}/>
+          <Route path='/loginScreen' element={<LoginScreen/>}/>
         </Routes>
       </main>
     </div>
