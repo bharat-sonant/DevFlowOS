@@ -1,4 +1,4 @@
-import { EmployeesEntity } from "../../employees/entities/employees.entity";
+import { UsersEntity } from "../../users/entities/users.entity";
 
 export class CompaniesEntity {
   id!: string;
@@ -7,5 +7,5 @@ export class CompaniesEntity {
   full_name!: string | null;
   email!: string;
   created_at!: Date;
-  employees?: EmployeesEntity[];
+  users?: UsersEntity[];
 }

@@ -1,11 +1,11 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  output   = "../../node_modules/.prisma/client"
 }
 
 generator nestjsDto {
   provider                        = "prisma-generator-nestjs-dto"
-  output                          = "../../../packages/shared/src/models"
+  output                          = "../../../../packages/shared/src/models"
   addExplicitDefaults             = "true"
   baseDto                         = "true"
   classValidation                 = "false"
@@ -29,3 +29,7 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

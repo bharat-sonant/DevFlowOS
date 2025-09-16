@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-const schemaPath = path.resolve(__dirname, "../apps/api/prisma/schema.prisma");
+const schemaPath = path.resolve(__dirname, "../apps/api/prisma/schema/schema.prisma");
 const modelsDir = path.resolve(__dirname, "../apps/api/prisma/models");
 
 // ensure models dir exists

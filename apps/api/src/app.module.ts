@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'prisma/prisma.module';
-import { EmployeesModule } from './modules/employees/employees.module';
 import { CompaniesModule } from './modules/companies/companies.module';
+import { UserTokensModule } from './modules/user_tokens/user_tokens.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
-  imports: [PrismaModule, EmployeesModule, CompaniesModule]
+  imports: [PrismaModule, UserTokensModule, CompaniesModule, UsersModule]
 })
 export class AppModule {}

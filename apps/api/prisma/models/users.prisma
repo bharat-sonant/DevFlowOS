@@ -1,0 +1,23 @@
+model users {
+  id                                  String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  company_id                          String        @db.Uuid
+  email                               String        @db.Citext
+  username                            String?       @db.Citext
+  full_name                           String?
+  password_hash                       String?
+  is_owner                            Boolean?      @default(false)
+  is_active                           Boolean?      @default(false)
+  created_by                          String?       @db.Uuid
+  updated_by                          String?       @db.Uuid
+  created_at                          DateTime      @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  updated_at                          DateTime      @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  user_tokens                         user_tokens[]
+  companies                           companies     @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_users_created_byTousers       users?        @relation("users_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_users_users_created_byTousers users[]       @relation("users_created_byTousers")
+  users_users_updated_byTousers       users?        @relation("users_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_users_users_updated_byTousers users[]       @relation("users_updated_byTousers")
+
+  @@unique([company_id, email], map: "unique_company_user_email")
+  @@unique([company_id, username], map: "unique_company_user_username")
+}

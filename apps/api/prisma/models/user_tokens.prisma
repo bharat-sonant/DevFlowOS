@@ -1,0 +1,12 @@
+model user_tokens {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String?   @db.Uuid
+  email       String    @db.Citext
+  token       String    @unique
+  type        String
+  is_verified Boolean   @default(false)
+  used_at     DateTime? @db.Timestamptz(6)
+  expires_at  DateTime  @db.Timestamptz(6)
+  created_at  DateTime  @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  users       users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}

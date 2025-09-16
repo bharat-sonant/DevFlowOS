@@ -5,30 +5,27 @@ generator client {
 
 generator nestjsDto {
   provider                        = "prisma-generator-nestjs-dto"
-  output                          = "../../../packages/shared/src/models"
+  output                          = "../../../../packages/shared/src/models"
   outputToNestJsResourceStructure = true
   baseDto                         = true
-  classValidation                 = false         // disable class-validator
-  swagger                         = false         // disable swagger support
+  classValidation                 = false // disable class-validator
+  swagger                         = false // disable swagger support
   disableSwaggerDecorators        = true
   decorateEntities                = false
   dtoSuffix                       = "Dto"
   entitySuffix                    = "Entity"
-  separateEntityFiles              = true
-  separateDtoFiles                 = true
+  separateEntityFiles             = true
+  separateDtoFiles                = true
   outputDtos                      = "dtos"
   outputEntities                  = "entities"
   outputDtoTypes                  = ["create", "update"]
-  generateResponseDto              = true
-  generateRelations                = false
-  addExplicitDefaults             = true          // makes generator add `!`
+  generateResponseDto             = true
+  generateRelations               = false
+  addExplicitDefaults             = true // makes generator add `!`
 }
-
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
-

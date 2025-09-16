@@ -1,6 +1,6 @@
 import { OmitType } from "@nestjs/mapped-types";
 import { filterKeys } from "@om/shared";
-import { CompaniesEntity } from "../entities/companies.entity";
+import { UserTokensEntity } from "../entities/userTokens.entity";
 
 // The full list of keys to attempt to omit
 
@@ -22,14 +22,13 @@ const allOmitKeys = [
   "deleted_at",
   "is_deleted",
   "isDeleted",
-  "users",
 ] as const;
 
 // Create a new, filtered list of keys that only contains keys that actually exist on the target entity
 
-const validOmitKeys = filterKeys(new CompaniesEntity(), allOmitKeys);
+const validOmitKeys = filterKeys(new UserTokensEntity(), allOmitKeys);
 
-export class CompaniesResponseDto extends OmitType(
-  CompaniesEntity as any,
+export class UserTokensResponseDto extends OmitType(
+  UserTokensEntity as any,
   validOmitKeys as any,
 ) {}
