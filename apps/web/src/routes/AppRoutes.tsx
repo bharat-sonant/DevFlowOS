@@ -11,7 +11,7 @@ import LoginScreen from '../pages/login-page/LoginScreen';
 const AppRoutes = () => {
     return (
          <Routes>
-          <Route path="/" element={<Navigate to="/companies" replace />} />
+          <Route path="/" element={<Navigate to="/register-company" replace />} />
           <Route path="/companies" element={<CompaniesPage/>} />
           <Route path="/register-company" element={<CompanyRegistrationPage/>}/>
           <Route path='/emailVerification' element={<EmailVerificationPage/>}/>

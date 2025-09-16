@@ -1,8 +1,80 @@
 
 import { Injectable } from "@nestjs/common";
 import { CompaniesServiceBase } from "./base/companies.service.base";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class CompaniesService extends CompaniesServiceBase {
+  constructor(protected readonly prisma : PrismaService){
+    super(prisma)
+  }
   // Add custom business logic here
+  private generateCompanyCode() : string {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    const digits = "123456789";
+
+    let alphaPart = "";
+    for(let i=0; i< 3; i++){
+      alphaPart += letters.charAt(Math.floor(Math.random() * letters.length))
+    }
+
+    let numPart = "";
+    for(let i=0; i<3; i++){
+      numPart += digits.charAt(Math.floor(Math.random() * digits.length))
+    }
+
+    return alphaPart + numPart;
+  }
+
+  private generateHMACToken (email:string) : { token: string; expiresAt: Date } {
+    const timeStamp = Date.now();
+    const expiresAt = new Date(timeStamp + 24 * 60 * 60 * 1000) //24 hrs
+
+    const data = `${email}:${timeStamp}:VERIFICATION`;
+     const secretKey = process.env.HMAC_SECRET_KEY || 'your-default-secret-key-change-this-in-production';
+
+     const signature = crypto.createHmac('sha256', secretKey).update(data).digest(hex);
+
+      const tokenData = `${timeStamp}:${signature}`;
+      const token = Buffer.from(tokenData).toString('base64url');
+
+      return{token, expiresAt}
+  }
+
+  
+
+  async preRegister (email : string){
+    const existing = await this.prisma.user_token.findUnique({
+      where : {email},
+    })
+
+    if(existing){
+      return{
+        message : "company already pre-registered",
+        companyId : existing.id,
+        email : existing.email
+      };
+    }
+
+  const { token, expiresAt } = this.generateHMACToken(email);
+
+
+    const company = await this.prisma.user_token.create({
+      data: {email,
+        is_verified : false,
+        type : 'VERIFICATION',
+        token : token,
+        expires_at : expiresAt
+      },
+    });
+
+
+    return {
+      message: "Company pre-registered successfully",
+      companyId: company.id,
+      email: company.email,
+     token: company.token,
+      verificationUrl: `${process.env.BASE_URL || 'http://localhost:3000'}/companies/auth/verify-email?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`
+    };
+  }
 }
