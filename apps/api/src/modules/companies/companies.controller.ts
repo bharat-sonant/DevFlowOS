@@ -35,7 +35,7 @@ export class CompaniesController extends CompaniesControllerBase {
 
     try {
        await this.service.verifyEmailToken(token, email);
-      return res.redirected(`${frontendUrl}/registrationForm?email=${encodeURIComponent(email)}&verified=true`);
+      return res.redirect(`${frontendUrl}/registrationForm?email=${encodeURIComponent(email)}&verified=true`);
       
     } catch (error : any) {
       // Error: Redirect to error page with specific error type

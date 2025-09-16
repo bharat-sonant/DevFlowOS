@@ -2,6 +2,8 @@
 import { Injectable } from "@nestjs/common";
 import { CompaniesServiceBase } from "./base/companies.service.base";
 import { PrismaService } from "prisma/prisma.service";
+import * as crypto from "crypto";
+
 
 @Injectable()
 export class CompaniesService extends CompaniesServiceBase {
@@ -33,7 +35,7 @@ export class CompaniesService extends CompaniesServiceBase {
     const data = `${email}:${timeStamp}:VERIFICATION`;
      const secretKey = process.env.HMAC_SECRET_KEY || 'your-default-secret-key-change-this-in-production';
 
-     const signature = crypto.createHmac('sha256', secretKey).update(data).digest(hex);
+     const signature = crypto.createHmac("sha256", secretKey).update(data).digest("hex");
 
       const tokenData = `${timeStamp}:${signature}`;
       const token = Buffer.from(tokenData).toString('base64url');
@@ -79,7 +81,7 @@ export class CompaniesService extends CompaniesServiceBase {
   }
 
   async preRegister (email : string){
-    const existing = await this.prisma.user_token.findUnique({
+    const existing = await this.prisma.userTokens.findUnique({
       where : {email},
     })
 
@@ -94,7 +96,7 @@ export class CompaniesService extends CompaniesServiceBase {
   const { token, expiresAt } = this.generateHMACToken(email);
 
 
-    const company = await this.prisma.user_token.create({
+    const company = await this.prisma.userTokens.create({
       data: {email,
         is_verified : false,
         type : 'VERIFICATION',
@@ -124,7 +126,7 @@ export class CompaniesService extends CompaniesServiceBase {
     }
 
     // Find the token in database
-    const userToken = await this.prisma.user_token.findFirst({
+    const userToken = await this.prisma.userTokens.findFirst({
       where: {
         email: email,
         token: token,
@@ -146,7 +148,7 @@ export class CompaniesService extends CompaniesServiceBase {
     }
 
     // Mark as verified
-    const updatedToken = await this.prisma.user_token.update({
+    const updatedToken = await this.prisma.userTokens.update({
       where: { id: userToken.id },
       data: { is_verified: true },
     });
