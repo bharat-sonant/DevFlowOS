@@ -2,6 +2,8 @@
 import { BadRequestException, Body, Controller, Get, Post, Query, Res } from "@nestjs/common";
 import { CompaniesControllerBase } from "./base/companies.controller.base";
 import { CompaniesService } from "./companies.service";
+import { Response } from "express";
+
 
 @Controller("companies")
 export class CompaniesController extends CompaniesControllerBase {
@@ -72,7 +74,7 @@ export class CompaniesController extends CompaniesControllerBase {
         success: true,
         ...result
       };
-    } catch (error) {
+    } catch (error:any) {
       throw new BadRequestException(`Token verification failed: ${error.message}`);
     }
   }
