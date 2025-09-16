@@ -41,7 +41,42 @@ export class CompaniesService extends CompaniesServiceBase {
       return{token, expiresAt}
   }
 
-  
+  // Verify HMAC token
+  verifyHMACToken(token: string, email: string): { valid: boolean; reason?: string } {
+    try {
+      // Decode the token
+      const decoded = Buffer.from(token, 'base64url').toString();
+      const [timestamp, signature] = decoded.split(':');
+      
+      // Check if timestamp exists
+      if (!timestamp || !signature) {
+        return { valid: false, reason: 'malformed_token' };
+      }
+      
+      // Check expiration (24 hours)
+      const tokenAge = Date.now() - parseInt(timestamp);
+      if (tokenAge > 24 * 60 * 60 * 1000) {
+        return { valid: false, reason: 'token_expired' };
+      }
+      
+      // Verify signature
+      const data = `${email}:${timestamp}:VERIFICATION`;
+      const secretKey = process.env.HMAC_SECRET_KEY || 'your-default-secret-key-change-this-in-production';
+      
+      const expectedSignature = crypto
+        .createHmac('sha256', secretKey)
+        .update(data)
+        .digest('hex');
+      
+      if (signature === expectedSignature) {
+        return { valid: true };
+      }
+      
+      return { valid: false, reason: 'invalid_signature' };
+    } catch (error) {
+      return { valid: false, reason: 'malformed_token' };
+    }
+  }
 
   async preRegister (email : string){
     const existing = await this.prisma.user_token.findUnique({
@@ -75,6 +110,52 @@ export class CompaniesService extends CompaniesServiceBase {
       email: company.email,
      token: company.token,
       verificationUrl: `${process.env.BASE_URL || 'http://localhost:3000'}/companies/auth/verify-email?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`
+    };
+  }
+
+
+ // Verify email with token
+  async verifyEmailToken(token: string, email: string) {
+    // Verify the HMAC token first
+    const verification = this.verifyHMACToken(token, email);
+    
+    if (!verification.valid) {
+      throw new Error(`Token verification failed: ${verification.reason}`);
+    }
+
+    // Find the token in database
+    const userToken = await this.prisma.user_token.findFirst({
+      where: {
+        email: email,
+        token: token,
+        type: 'VERIFICATION',
+      },
+    });
+
+    if (!userToken) {
+      throw new Error('Token not found in database');
+    }
+
+    if (userToken.is_verified) {
+      throw new Error('Token already used');
+    }
+
+    // Check database expiration as well (double check)
+    if (new Date() > userToken.expires_at) {
+      throw new Error('Token expired');
+    }
+
+    // Mark as verified
+    const updatedToken = await this.prisma.user_token.update({
+      where: { id: userToken.id },
+      data: { is_verified: true },
+    });
+
+    return {
+      message: 'Email verified successfully',
+      email: updatedToken.email,
+      verified: true,
+      tokenId: updatedToken.id
     };
   }
 }
