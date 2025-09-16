@@ -1,5 +1,5 @@
 import { OmitType } from "@nestjs/mapped-types";
-import { filterKeys } from "@om/shared";
+import { filterKeys } from "../../../utils/filter-keys";
 import { CompaniesEntity } from "../entities/companies.entity";
 
 // The full list of keys to attempt to omit

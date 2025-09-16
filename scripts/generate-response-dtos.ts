@@ -13,7 +13,8 @@ import { join } from "path";
 import * as fs from "fs";
 
 const modelsDir = join(__dirname, "../packages/shared/src/models");
-const FILTER_IMPORT_PATH = "@om/shared";
+// const FILTER_IMPORT_PATH = "@om/shared";
+const FILTER_IMPORT_PATH = "../../../utils/filter-keys";
 const SHARED_DIR = join(__dirname, "../packages/shared/src");
 
 const project = new Project({

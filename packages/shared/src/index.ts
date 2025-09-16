@@ -20,3 +20,7 @@ export * from './models/userTokens/entities/userTokens.entity';
 export * from './enums';
 export * from './utils';
 export * from './config';
+
+
+// Add dummy JS export to force JS emission
+export const __dummy = true;
