@@ -67,7 +67,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       setConfirmPasswordError("Passwords do not match ❌");
       return;
     }
-    navigate('/login')
+    navigate('/companycodescreen')
   };
 
   return (
