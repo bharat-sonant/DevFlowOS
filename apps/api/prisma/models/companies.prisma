@@ -6,4 +6,5 @@ model companies {
   email      String   @unique @db.Citext
   created_at DateTime @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
   users      users[]
+  is_verified Boolean  @default(false)  
 }
