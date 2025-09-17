@@ -81,7 +81,7 @@ export class CompaniesService extends CompaniesServiceBase {
   }
 
   async preRegister (email : string){
-    const existing = await this.prisma.userTokens.findUnique({
+    const existing = await this.prisma.user_tokens.findFirst({
       where : {email},
     })
 
@@ -96,7 +96,7 @@ export class CompaniesService extends CompaniesServiceBase {
   const { token, expiresAt } = this.generateHMACToken(email);
 
 
-    const company = await this.prisma.userTokens.create({
+    const company = await this.prisma.user_tokens.create({
       data: {email,
         is_verified : false,
         type : 'VERIFICATION',
@@ -126,7 +126,7 @@ export class CompaniesService extends CompaniesServiceBase {
     }
 
     // Find the token in database
-    const userToken = await this.prisma.userTokens.findFirst({
+    const userToken = await this.prisma.user_tokens.findFirst({
       where: {
         email: email,
         token: token,
@@ -148,7 +148,7 @@ export class CompaniesService extends CompaniesServiceBase {
     }
 
     // Mark as verified
-    const updatedToken = await this.prisma.userTokens.update({
+    const updatedToken = await this.prisma.user_tokens.update({
       where: { id: userToken.id },
       data: { is_verified: true },
     });

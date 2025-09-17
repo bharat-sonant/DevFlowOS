@@ -1,15 +1,10 @@
-import { Controller } from '@nestjs/common';
-import { CompaniesControllerBase } from './base/companies.controller.base';
-import { CompaniesService } from './companies.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
-
-@Controller('companies')
-@ApiBearerAuth('access-token') 
-import { BadRequestException, Body, Controller, Get, Post, Query, Res } from "@nestjs/common";
 import { CompaniesControllerBase } from "./base/companies.controller.base";
 import { CompaniesService } from "./companies.service";
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Get, Post, Query, Res } from "@nestjs/common";
 import { Response } from "express";
 
+@ApiBearerAuth('access-token') 
 @Controller("companies")
 export class CompaniesController extends CompaniesControllerBase {
   constructor(protected readonly service: CompaniesService) {
