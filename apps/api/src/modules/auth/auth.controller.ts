@@ -26,10 +26,4 @@ export class AuthController {
     );
   }
 
-  // dummy endpoint for quick testing
-  @Public()
-  @Get('testlogin')
-  testLogin() {
-    return this.authService.testLogin();
-  }
 }
