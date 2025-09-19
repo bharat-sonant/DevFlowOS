@@ -3,6 +3,9 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import open from 'open';
 import { TokenAuthGuard } from './modules/auth/token-auth.guard';
+import { ErrorsInterceptor } from './common/interceptors/errors.interceptor';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +19,12 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new TokenAuthGuard(reflector));
 
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new TransformInterceptor(),
+    new ErrorsInterceptor(),
+  );
+  
   // ✅ Swagger config with Bearer Auth
   const config = new DocumentBuilder()
     .setTitle('Task Management API')
