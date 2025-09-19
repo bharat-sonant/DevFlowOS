@@ -10,7 +10,7 @@ export const newRegistrationTemplate = (
     <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; background:#fff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
       <tr>
         <td style="padding:20px; text-align:center; background:#00695c; border-top-left-radius:8px; border-top-right-radius:8px;">
-          <h2 style="color:#fff; margin:0;">Welcome to ${companyName}</h2>
+          <h2 style="color:#fff; margin:0;">Welcome to ${userCompanyName}</h2>
         </td>
       </tr>
       <tr>
