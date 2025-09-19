@@ -1,6 +1,6 @@
 export const newRegistrationTemplate = (
   companyCode: string,
-  empCode: string,
+  username: string,
   // password: string,
   userCompanyName: string
 ): string => {
@@ -18,7 +18,7 @@ export const newRegistrationTemplate = (
           <p style="font-size:16px;">Your account has been created successfully. Below are your login credentials:</p>
           <ul style="list-style:none; padding:0; font-size:15px; color:#444;">
             <li><strong>Company Code:</strong> ${companyCode}</li>
-            <li><strong>Employee Code:</strong> ${empCode}</li>
+            <li><strong>User Name:</strong> ${username}</li>
           </ul>
           <p style="margin-top:20px; font-size:15px;">You can login using the link below:</p>
           <a href="${process.env.FRONTEND_URL}" style="display:inline-block; margin-top:10px; padding:12px 24px; background:#00695c; color:#fff; text-decoration:none; border-radius:4px; font-weight:bold;">Login Now</a>

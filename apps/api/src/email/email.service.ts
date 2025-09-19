@@ -51,7 +51,7 @@ export class EmailService {
 
   async sendNewRegistrationEmail(
     to: string,
-    empCode: string,
+    username: string,
     // password: string,
     companyCode: string,
     companyName: string,
@@ -59,7 +59,7 @@ export class EmailService {
     const subject = 'Task Management Login Credentials';
     const html = newRegistrationTemplate(
       companyCode,
-      empCode,
+      username,
       // password,
       companyName,
     );

@@ -7,6 +7,9 @@ import { TokenService } from './token.service';
 import { TokenStrategy } from './token.strategy';
 import { PrismaService } from 'prisma/prisma.service';
 import { AuthController } from './auth.controller';
+import { CommonService } from 'src/common/services/common.service';
+import { CommonModule } from 'src/common/services/common.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
@@ -15,6 +18,8 @@ import { AuthController } from './auth.controller';
       secret: process.env.TOKEN_SECRET,
       signOptions: { expiresIn: process.env.ACCESS_EXPIRE_SHORT || '15m' },
     }),
+    CommonModule,
+    EmailModule
   ],
   providers: [AuthService, TokenService, TokenStrategy, PrismaService],
   controllers: [AuthController],
