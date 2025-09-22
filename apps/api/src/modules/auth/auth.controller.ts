@@ -1,8 +1,8 @@
 // apps/api/src/modules/auth/auth.controller.ts
-import { Controller, Post, Body, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { Public } from './public.decorator';
 import { AuthService } from './auth.service';
-import { RegisterDto } from '@om/shared';
+import { LoginDto, RegisterDto } from '@om/shared';
 
 @Controller('auth')
 export class AuthController {
@@ -16,22 +16,15 @@ export class AuthController {
   }
 
   @Public()
-  @Post('login')
-  async login(
-    @Body()
-    dto: {
-      email: string;
-      password: string;
-      companyId: string;
-      remember?: boolean;
-    },
-  ) {
-    return this.authService.login(
-      dto.email,
-      dto.password,
-      dto.companyId,
-      !!dto.remember,
-    );
+  @Get('validate-company')
+  async validateCompany(@Query('companyCode') companyCode: string) {
+    return this.authService.validateCompany(companyCode);
+  }
+
+  @Public()
+   @Post('login')
+  async login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
   }
 
 }

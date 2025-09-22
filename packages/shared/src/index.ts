@@ -17,6 +17,7 @@ export * from './models/userTokens/dto/userTokens.response.dto';
 export * from './models/userTokens/entities/userTokens.entity';
 
 export * from './models/auth/dto/register.dto';
+export * from './models/auth/dto/login.dto';
 
 
 export * from './enums';

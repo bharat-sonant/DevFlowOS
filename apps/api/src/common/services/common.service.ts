@@ -15,6 +15,11 @@ export class CommonService {
       .join('');
   }
 
+  async comparePassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
+  }
+
+
   /**
    * Hash a password using bcrypt
    * @param password plain text password

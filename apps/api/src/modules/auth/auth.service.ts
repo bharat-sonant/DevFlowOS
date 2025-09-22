@@ -8,7 +8,8 @@ import { TokenService } from './token.service';
 import { PrismaService } from 'prisma/prisma.service';
 import { EmailService } from 'src/email/email.service';
 import { CommonService } from 'src/common/services/common.service';
-import { RegisterDto } from '@om/shared';
+import { LoginDto, RegisterDto } from '@om/shared';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private tokenService: TokenService,
-    private common: CommonService,
+    private commonService: CommonService,
     private emailService: EmailService
   ) { }
 
@@ -56,7 +57,7 @@ export class AuthService {
 
     let companyCode: string | null = null;
     for (let i = 0; i < 10; i++) {
-      const code = this.common.generateCode(companyCodeLength);
+      const code = this.commonService.generateCode(companyCodeLength);
       const exists = await this.prisma.companies.findUnique({ where: { code } });
       if (!exists) {
         companyCode = code;
@@ -70,7 +71,7 @@ export class AuthService {
     }
 
     // Step 3: hash password
-    const passwordHash = await this.common.hashPassword(password);
+    const passwordHash = await this.commonService.hashPassword(password);
 
     // Step 4: transaction
     try {
@@ -142,24 +143,75 @@ export class AuthService {
     }
   }
 
-  async login(
-    email: string,
-    password: string,
-    companyId: string,
-    remember = false,
-  ) {
-    const user = await this.prisma.users.findUnique({
+  async validateCompany(companyCode: string) {
+    const company = await this.prisma.companies.findUnique({
+      where: { code: companyCode },
+    });
+
+    if (!company) {
+      throw new BadRequestException('Invalid company code');
+    }
+
+    return {
+      companyId: company.id,
+      companyName: company.name,
+      companyCode: company.code,
+    };
+  }
+
+  async login(dto: LoginDto) {
+    // validate UUID before hitting DB
+    if (!isUUID(dto.companyId)) {
+      throw new UnauthorizedException('Invalid company ID!');
+    }
+    const company = await this.prisma.companies.findUnique({
+      where: { id: dto.companyId },
+    });
+
+    if (!company) {
+      throw new UnauthorizedException('Invalid company!');
+    }
+
+    const user = await this.prisma.users.findFirst({
       where: {
-        company_id_email: {
-          company_id: companyId, // must come from login input
-          email,
-        },
+        company_id: company.id,
+        username: dto.username,
       },
     });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-    const ok = await bcrypt.compare(password, user.password_hash ?? '');
-    if (!ok) throw new UnauthorizedException('Invalid credentials');
-    return this.tokenService.createAccessToken(user.id, user.email, remember);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid username or password!');
+    }
+
+    const isPasswordValid = await this.commonService.comparePassword(
+      dto.password,
+      user.password_hash!,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid username or password!');
+    }
+
+    const { accessToken, expiresIn } = await this.tokenService.createAccessToken(
+      user.id,
+      user.email,
+      dto.rememberMe,
+    );
+
+    return {
+      token: accessToken,
+      expiresIn,
+      user: {
+        id: user.id,
+        username: user.username,
+        isOwner: user.is_owner,
+      },
+      company: {
+        id: company.id,
+        code: company.code,
+        name: company.name,
+      },
+    };
   }
 
   async testLogin() {
