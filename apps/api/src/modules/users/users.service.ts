@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import { PrismaService } from "prisma/prisma.service";
 import { EmailService } from "src/email/email.service";
 import { CommonService } from "src/common/services/common.service";
+import { UserTokenType } from "@om/shared";
 
 @Injectable()
 export class UsersService extends UsersServiceBase {
@@ -19,7 +20,7 @@ export class UsersService extends UsersServiceBase {
   async inviteUser(email: string, companyId: string, invitedBy: string) {
     // check if already invited or exists
     const existingToken = await this.prisma.user_tokens.findFirst({
-      where: { email, type: 'INVITE', is_verified: false },
+      where: { email, type: UserTokenType.INVITE, is_verified: false },
     });
 
     if (existingToken) {
@@ -34,7 +35,7 @@ export class UsersService extends UsersServiceBase {
         email,
         user_id: invitedBy,
         token,
-        type: 'INVITE',
+        type: UserTokenType.INVITE,
         expires_at: expiresAt
       },
     });
@@ -53,4 +54,34 @@ export class UsersService extends UsersServiceBase {
       expiresAt,
     };
   }
+
+  async validateInvite(token: string) {
+    const userToken = await this.prisma.user_tokens.findFirst({
+      where: {
+        token,
+        type: UserTokenType.INVITE,
+        is_verified: false,
+        expires_at: { gt: new Date() },
+      },
+      include: {
+        users: {
+          include: {
+            companies: true,
+          },
+        },
+      },
+    });
+console.log('userToken: ', userToken);
+    if (!userToken || !userToken.users) {
+      return null;
+    }
+
+    return {
+      email: userToken.email,
+      companyId: userToken.users.companies.id,
+      companyName: userToken.users.companies.name,
+      companyCode: userToken.users.companies.code,
+    };
+  }
+
 }

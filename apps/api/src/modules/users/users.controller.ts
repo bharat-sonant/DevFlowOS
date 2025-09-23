@@ -1,11 +1,11 @@
-import { Body, Controller, Post, Req, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Post, Query, Req, UnauthorizedException } from "@nestjs/common";
 import { UsersControllerBase } from "./base/users.controller.base";
 import { UsersService } from "./users.service";
 import { Request } from 'express';
-import { InviteUserDto } from "@om/shared";
-import { ApiBearerAuth } from "@nestjs/swagger";
+import { InviteUserDto, ValidateInviteDto } from "@om/shared";
+import { ApiBearerAuth, ApiExtraModels, ApiQuery } from "@nestjs/swagger";
 
-@ApiBearerAuth('access-token') 
+@ApiBearerAuth('access-token')
 @Controller("users")
 export class UsersController extends UsersControllerBase {
   constructor(protected readonly usersService: UsersService) {
@@ -20,5 +20,28 @@ export class UsersController extends UsersControllerBase {
     }
 
     return this.usersService.inviteUser(dto.email, companyId, userId);
+  }
+
+  @Get('validate-invite')
+  @ApiQuery({ name: 'token', type: String, required: true })
+  async validateInvite(@Query('token') token: string) {
+    console.log('query.token: ', token);
+
+    if (!token) {
+      throw new BadRequestException('Token is required!');
+    }
+
+    const result = await this.usersService.validateInvite(token);
+
+    if (!result) {
+      throw new BadRequestException('Invitation link is invalid or expired');
+    }
+
+    return {
+      companyId: result.companyId,
+      companyName: result.companyName,
+      companyCode: result.companyCode,
+      email: result.email,
+    };
   }
 }

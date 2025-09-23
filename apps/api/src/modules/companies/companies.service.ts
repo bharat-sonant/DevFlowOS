@@ -3,6 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { CompaniesServiceBase } from "./base/companies.service.base";
 import { PrismaService } from "prisma/prisma.service";
 import * as crypto from "crypto";
+import { UserTokenType } from "@om/shared";
 
 
 @Injectable()
@@ -99,7 +100,7 @@ export class CompaniesService extends CompaniesServiceBase {
     const company = await this.prisma.user_tokens.create({
       data: {email,
         is_verified : false,
-        type : 'VERIFICATION',
+        type : UserTokenType.VERIFICATION,
         token : token,
         expires_at : expiresAt
       },
@@ -130,7 +131,7 @@ export class CompaniesService extends CompaniesServiceBase {
       where: {
         email: email,
         token: token,
-        type: 'VERIFICATION',
+        type: UserTokenType.VERIFICATION,
       },
     });
 
