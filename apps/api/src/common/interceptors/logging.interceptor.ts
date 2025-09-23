@@ -1,16 +1,15 @@
-// apps/api/src/common/interceptors/logging.interceptor.ts
 import {
   Injectable,
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  Logger,
 } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
+import { LoggingService } from '../services/logging.service';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(LoggingInterceptor.name);
+  constructor(private readonly loggingService: LoggingService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
@@ -20,7 +19,10 @@ export class LoggingInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         const time = Date.now() - now;
-        this.logger.log(`${method} ${url} - ${time}ms`);
+        this.loggingService.log(
+          LoggingInterceptor.name,
+          `${method} ${url} - ${time}ms`,
+        );
       }),
     );
   }

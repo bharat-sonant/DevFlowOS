@@ -8,10 +8,13 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { LoggingService } from '../services/logging.service';
 
 @Injectable()
 export class ErrorsInterceptor implements NestInterceptor {
   private readonly logger = new Logger(ErrorsInterceptor.name);
+  
+  constructor(private readonly loggingService: LoggingService) { }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const res = context.switchToHttp().getResponse();
@@ -22,7 +25,8 @@ export class ErrorsInterceptor implements NestInterceptor {
         const status = err.getStatus ? err.getStatus() : 500;
         const message = err.response?.message || err.message || 'Internal server error';
 
-        this.logger.error(
+        this.loggingService.error(
+          ErrorsInterceptor.name,
           `Error in ${req.method} ${req.url}: ${message}`,
           err.stack,
         );
