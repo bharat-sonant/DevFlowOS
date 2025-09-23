@@ -4,6 +4,7 @@ import axios from 'axios';
 import { verificationTemplate } from './templates/verification.template';
 import { resetPasswordTemplate } from './templates/reset-password.template';
 import { newRegistrationTemplate } from './templates/new-registration.template';
+import { userInviteTemplate } from './templates/user_invite.template';
 
 @Injectable()
 export class EmailService {
@@ -65,4 +66,16 @@ export class EmailService {
     );
     return this.sendEmail(to, subject, html);
   }
+
+  async sendInviteEmail(to: string, token: string, companyName: string): Promise<boolean> {
+    const inviteLink = `${process.env.FRONTEND_URL}/register?token=${token}`;
+    const html = userInviteTemplate(inviteLink, companyName);
+
+    return this.sendEmail(
+      to,
+      'You’re invited to join!',
+      html,
+    );
+  }
+
 }

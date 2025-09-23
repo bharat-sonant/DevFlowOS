@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class CommonService {
@@ -28,4 +29,20 @@ export class CommonService {
     const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10);
     return bcrypt.hash(password, saltRounds);
   }
+
+  generateToken (email:string) : { token: string; expiresAt: Date } {
+    const timeStamp = Date.now();
+    const expiresAt = new Date(timeStamp + 24 * 60 * 60 * 1000) //24 hrs
+
+    const data = `${email}:${timeStamp}:VERIFICATION`;
+     const secretKey = process.env.HMAC_SECRET_KEY || 'your-default-secret-key-change-this-in-production';
+
+     const signature = crypto.createHmac('sha256', secretKey).update(data).digest('hex');
+
+      const tokenData = `${timeStamp}:${signature}`;
+      const token = Buffer.from(tokenData).toString('base64url');
+
+      return{token, expiresAt}
+  }
+
 }

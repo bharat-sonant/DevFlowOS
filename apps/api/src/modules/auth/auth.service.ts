@@ -194,7 +194,9 @@ export class AuthService {
 
     const { accessToken, expiresIn } = await this.tokenService.createAccessToken(
       user.id,
+      dto.companyId,
       user.email,
+      user.is_owner!,
       dto.rememberMe,
     );
 
@@ -216,10 +218,10 @@ export class AuthService {
 
   async testLogin() {
     // hardcoded fake user
-    const fakeUserId = '00000000-0000-0000-0000-000000000001';
+    const fakeUserId = '00000000-0000-0000-0000-000000000002';
     const fakeEmail = 'dummy@example.com';
 
     // always issues a valid token, no DB check
-    return this.tokenService.createAccessToken(fakeUserId, fakeEmail, false);
+    return this.tokenService.createAccessToken(fakeUserId,'00000000-0000-0000-0000-000000000001', fakeEmail,false, false);
   }
 }

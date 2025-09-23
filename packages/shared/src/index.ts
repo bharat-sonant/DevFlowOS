@@ -10,6 +10,7 @@ export * from './models/users/dto/create-users.dto';
 export * from './models/users/dto/update-users.dto';
 export * from './models/users/dto/users.response.dto';
 export * from './models/users/entities/users.entity';
+export * from './models/users/dto/invite-user.dto';
 
 export * from './models/userTokens/dto/create-userTokens.dto';
 export * from './models/userTokens/dto/update-userTokens.dto';

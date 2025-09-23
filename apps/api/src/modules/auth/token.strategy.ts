@@ -13,6 +13,6 @@ export class TokenStrategy extends PassportStrategy(Strategy, 'token') {
   }
 
   async validate(payload: any) {
-    return { id: payload.sub, email: payload.email };
+    return payload;
   }
 }

@@ -7,13 +7,13 @@ import { randomUUID } from 'crypto';
 export class TokenService {
   constructor(private jwtService: JwtService) {}
 
-  async createAccessToken(userId: string, email: string, remember = false) {
+  async createAccessToken(userId: string, companyId: string, email: string, isOwner = false, remember = false) {
     const jti = randomUUID();
-    const payload = { sub: userId, email, jti };
+    const payload = { sub: userId, companyId, email, isOwner, jti };
 
     const expiresIn = remember
       ? process.env.ACCESS_EXPIRE_REMEMBER || '4d'
-      : process.env.ACCESS_EXPIRE_SHORT || '15m';
+      : process.env.ACCESS_EXPIRE_SHORT || '8h';
 
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.TOKEN_SECRET || 'default_dev_secret',
