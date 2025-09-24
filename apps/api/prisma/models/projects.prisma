@@ -1,0 +1,16 @@
+model projects {
+  id                               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  company_id                       String    @db.Uuid
+  prefix                           String    @db.Citext
+  name                             String
+  description                      String?
+  is_active                        Boolean   @default(true)
+  is_deleted                       Boolean   @default(false)
+  created_by                       String?   @db.Uuid
+  updated_by                       String?   @db.Uuid
+  created_at                       DateTime  @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  updated_at                       DateTime? @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  companies                        companies @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_projects_created_byTousers users?    @relation("projects_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_projects_updated_byTousers users?    @relation("projects_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}

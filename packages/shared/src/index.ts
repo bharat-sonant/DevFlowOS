@@ -18,6 +18,11 @@ export * from './models/userTokens/dto/update-userTokens.dto';
 export * from './models/userTokens/dto/userTokens.response.dto';
 export * from './models/userTokens/entities/userTokens.entity';
 
+export * from './models/projects/dto/create-projects.dto';
+export * from './models/projects/dto/update-projects.dto';
+export * from './models/projects/dto/projects.response.dto';
+export * from './models/projects/entities/projects.entity';
+
 export * from './models/auth/dto/register.dto';
 export * from './models/auth/dto/login.dto';
 

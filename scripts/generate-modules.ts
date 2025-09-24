@@ -160,7 +160,10 @@ export class ${modelName}Controller extends ${modelName}ControllerBase {
   }
 
   // ---------- Module ----------
-  const moduleContent = `
+  const modulePath = path.join(folder, `${modelFileName}.module.ts`);
+
+  if (!fs.existsSync(modulePath)) {
+    const moduleContent = `
 import { Module } from "@nestjs/common";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { ${modelName}ServiceBase } from "./base/${modelFileName}.service.base";
@@ -175,11 +178,13 @@ import { ${modelName}Controller } from "./${modelFileName}.controller";
 })
 export class ${modelName}Module {}
 `;
-  fs.writeFileSync(
-    path.join(folder, `${modelFileName}.module.ts`),
-    moduleContent,
-    { encoding: "utf-8" }
-  );
+
+    fs.writeFileSync(modulePath, moduleContent, { encoding: "utf-8" });
+    console.log(`✅ Created: ${modulePath}`);
+  } else {
+    console.log(`⚡ Skipped: ${modulePath} already exists`);
+  }
+
 }
 
 function main() {

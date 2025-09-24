@@ -1,6 +1,6 @@
 export class LoginDto {
-    companyId!: string;
-    username!: string;
-    password!: string;
-    rememberMe?: boolean;
+  companyId!: string;
+  username!: string;
+  password!: string;
+  rememberMe?: boolean;
 }

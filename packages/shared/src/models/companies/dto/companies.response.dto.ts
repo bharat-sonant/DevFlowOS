@@ -22,6 +22,7 @@ const allOmitKeys = [
   "deleted_at",
   "is_deleted",
   "isDeleted",
+  "projects",
   "users",
 ] as const;
 
