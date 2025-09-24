@@ -1,3 +1,4 @@
+import { ProjectsEntity } from "../../projects/entities/projects.entity";
 import { UserTokensEntity } from "../../userTokens/entities/userTokens.entity";
 import { CompaniesEntity } from "../../companies/entities/companies.entity";
 
@@ -14,6 +15,8 @@ export class UsersEntity {
   updated_by!: string | null;
   created_at!: Date;
   updated_at!: Date;
+  projects_projects_created_byTousers?: ProjectsEntity[];
+  projects_projects_updated_byTousers?: ProjectsEntity[];
   user_tokens?: UserTokensEntity[];
   companies?: CompaniesEntity;
   users_users_created_byTousers?: UsersEntity | null;

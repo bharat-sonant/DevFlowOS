@@ -11,6 +11,7 @@ import { ErrorsInterceptor } from './common/interceptors/errors.interceptor';
 import { LoggingService } from './common/services/logging.service';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { ProjectsModule } from './modules/projects/projects.module';
 
 const devModules = [];
 if (process.env.NODE_ENV === 'development') {
@@ -41,6 +42,7 @@ if (process.env.NODE_ENV === 'development') {
     UserTokensModule,
     CompaniesModule,
     UsersModule,
+    ProjectsModule
   ],
 })
 export class AppModule { }

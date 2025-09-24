@@ -1,10 +1,10 @@
 model companies {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code       String   @unique @db.Citext
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code       String     @unique @db.Citext
   name       String
   full_name  String?
-  email      String   @unique @db.Citext
-  created_at DateTime @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  email      String     @unique @db.Citext
+  created_at DateTime   @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  projects   projects[]
   users      users[]
-  is_verified Boolean  @default(false)  
 }

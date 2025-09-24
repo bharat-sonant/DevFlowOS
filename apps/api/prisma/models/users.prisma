@@ -11,6 +11,8 @@ model users {
   updated_by                          String?       @db.Uuid
   created_at                          DateTime      @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
   updated_at                          DateTime      @default(dbgenerated("timezone('Asia/Kolkata'::text, now())")) @db.Timestamptz(6)
+  projects_projects_created_byTousers projects[]    @relation("projects_created_byTousers")
+  projects_projects_updated_byTousers projects[]    @relation("projects_updated_byTousers")
   user_tokens                         user_tokens[]
   companies                           companies     @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users_users_created_byTousers       users?        @relation("users_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
