@@ -7,7 +7,7 @@ export default function ProjectList() {
 
   async function getProjects() {
     try {
-      const response = await api.get("");
+      const response = await api.get("/get/project");
       console.log(response.data);
       setProjects(response.data);
     } catch (error) {
