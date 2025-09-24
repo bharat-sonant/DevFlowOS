@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../../services/api";
 
 const RegistrationForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     { rule: string; isValid: boolean }[]
   >([]);
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [loading, setLoading] = useState(false)
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -62,12 +64,28 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async(e: React.FormEvent) => {
+    e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       setConfirmPasswordError("Passwords do not match ❌");
       return;
     }
-    navigate('/companycodescreen')
+    setLoading(true)
+    try{
+      const res = await api.post('/auth/register',{
+        companyName : formData.companyName,
+        username: formData.username,
+        password: formData.password,
+      })
+
+       console.log("Registration success:", res.data);
+       navigate('/login')
+    }catch(error){
+      console.log('error', error)
+    }
+    finally{
+      setLoading(false)
+    }
   };
 
   return (

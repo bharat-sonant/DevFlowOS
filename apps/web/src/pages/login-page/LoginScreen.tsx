@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../../services/api";
 
 const LoginScreen = () => {
   const navigate = useNavigate();
@@ -8,6 +9,8 @@ const LoginScreen = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -17,12 +20,36 @@ const LoginScreen = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.username || !formData.password) {
-      alert("Please fill both fields");
+      setError("⚠️ Please fill both fields");
       return;
     }
-    navigate("/project");
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const companyCode = localStorage.getItem("companyCode"); // ✅ use from previous screen
+      const res = await api.post("/auth/login", {
+        companyCode,
+        username: formData.username,
+        password: formData.password,
+      });
+
+      // ✅ Save token & redirect
+      localStorage.setItem("token", res.data.token);
+      navigate("/project");
+    } catch (err: any) {
+      console.error(err);
+      if (err.response?.status === 401) {
+        setError("❌ Invalid username or password");
+      } else {
+        setError("❌ Server error. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -352,6 +379,7 @@ const LoginScreen = () => {
 
             <button
               onClick={handleSubmit}
+              disabled={loading}
               style={{
                 background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
                 border: "none",
@@ -377,7 +405,7 @@ const LoginScreen = () => {
                 target.style.boxShadow = "none";
               }}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
           </div>
         </div>
