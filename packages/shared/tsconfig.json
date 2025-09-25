@@ -8,6 +8,11 @@
     "composite": true,
     "module": "commonjs",
     "target": "ES2021",
+    // Needed for class-validator decorators
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    // Recommended
+    "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "skipLibCheck": true
   },
