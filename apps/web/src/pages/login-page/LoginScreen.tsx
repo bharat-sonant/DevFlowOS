@@ -24,7 +24,6 @@ const LoginScreen = () => {
 
   const handleSubmit = async () => {
     if (!formData.username || !formData.password) {
-      setError("⚠️ Please fill both fields");
       return;
     }
 

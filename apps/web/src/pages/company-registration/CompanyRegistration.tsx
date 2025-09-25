@@ -20,6 +20,9 @@ const CompanyRegistrationPage = () => {
   };
 
   const handleSubmit = async () => {
+    if(!formData.email){
+      return;
+    }
     try {
       setLoading(true)
       const result = await api.post("/companies/pre-register", {email:formData.email});
