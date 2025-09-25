@@ -14,6 +14,7 @@
     "db:pull:api": "dotenv -e apps/api/prisma/.env -- npx prisma db pull --schema=apps/api/prisma/schema.prisma",
     "start:web": "pnpm --filter web dev",
     "dev:mobile": "pnpm --filter mobile start",
+    "init:setup": "tsx scripts/prisma-merge-generate.ts",
     "start:api": "pnpm --filter api start",
     "build:api": "pnpm --filter @om/shared run build && pnpm --filter api build"
   },
