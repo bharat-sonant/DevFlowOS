@@ -12,7 +12,7 @@ export class ProjectsService extends ProjectsServiceBase {
   async getAllProjects(companyId: string, includeDeleted = false) {
     return this.prisma.projects.findMany({
       where: {
-        companyId,
+        company_id : companyId,
         ...(includeDeleted ? {} : { is_deleted: false }),
       },
       select: {

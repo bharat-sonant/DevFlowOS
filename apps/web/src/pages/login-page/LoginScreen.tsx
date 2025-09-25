@@ -12,6 +12,7 @@ const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const companyId = localStorage.getItem('companyId')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,15 +32,17 @@ const LoginScreen = () => {
       setLoading(true);
       setError("");
 
-      const companyCode = localStorage.getItem("companyCode");
       const res = await api.post("/auth/login", {
-        companyCode,
+        companyId,
         username: formData.username,
         password: formData.password,
       });
+      console.log('login result', res)
 
-      localStorage.setItem("token", res.data.token);
+      if(res.data.success){
+        localStorage.setItem("token", res.data.data.token);
       navigate("/project");
+      }
     } catch (err: any) {
       console.error(err);
       if (err.response?.status === 401) {

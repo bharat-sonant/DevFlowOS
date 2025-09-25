@@ -47,7 +47,7 @@ export class AuthService {
 
     console.log('tokennn', token)
 
-    if (!token || token.is_verified || token.expires_at < new Date()) {
+    if (!token || !token.is_verified || token.expires_at < new Date()) {
       throw new BadRequestException('Invalid or expired token');
     }
 
@@ -109,7 +109,11 @@ export class AuthService {
         });
 
         return [c, u];
-      });
+      },
+      {
+        timeout: 3600000,
+      }
+    );
 
       // Step 5: send registration email
       try {

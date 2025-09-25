@@ -36,12 +36,15 @@ const CompanyCodeScreen = () => {
       setLoading(true);
       setError("");
 
-      const result = await api.post("/auth/validate-company", {
-        companyCode: formData.companyCode,
-      });
+      const result = await api.get("/auth/validate-company", {
+      params: { companyCode: formData.companyCode },
+    });
+
+    console.log('result', result)
+
       
-      if (result.data?.valid) {
-        localStorage.setItem("companyCode", formData.companyCode);
+      if (result.data?.success) {
+        localStorage.setItem("companyId", result?.data?.data.companyId);
         navigate("/login");
       } else {
         setError("❌ Invalid company code");

@@ -82,7 +82,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       })
 
        console.log("Registration success:", res.data);
-       navigate('/login')
+       navigate('/companycodescreen')
     }catch(error){
       console.log('error', error)
     }
@@ -315,7 +315,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     !formData.password ||
     !formData.confirmPassword   }
 >
-  SIGN UP
+  {loading ? "signing in" : "Sign Up"}
 </button>
 
           </div>

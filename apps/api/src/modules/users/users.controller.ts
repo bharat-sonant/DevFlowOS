@@ -4,6 +4,7 @@ import { UsersService } from "./users.service";
 import { Request } from 'express';
 import { CompleteRegistrationDto, InviteUserDto, ValidateInviteDto } from "@om/shared";
 import { ApiBearerAuth, ApiExtraModels, ApiQuery } from "@nestjs/swagger";
+import { Public } from "../auth/public.decorator";
 
 @ApiBearerAuth('access-token')
 @Controller("users")
@@ -44,6 +45,7 @@ export class UsersController extends UsersControllerBase {
     };
   }
 
+  @Public()
   @Post('complete-registration')
   async completeRegistration(@Req() req: Request, @Body() dto: CompleteRegistrationDto) {
     const { sub: userId, companyId, isOwner } = req.user as any;
