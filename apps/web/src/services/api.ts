@@ -7,6 +7,17 @@ export const api = axios.create({
   withCredentials: false,
 })
 
+// Automatically attach token from localStorage
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token && config.headers) {
+    // Use `set` method for AxiosHeaders
+    config.headers.set('Authorization', `Bearer ${token}`);
+  }
+  return config;
+});
+
+
 // (Optional) interceptors for logging/errors
 api.interceptors.response.use(
   (res) => res,
