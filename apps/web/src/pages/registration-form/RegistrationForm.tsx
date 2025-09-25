@@ -19,6 +19,8 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   >([]);
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [loading, setLoading] = useState(false)
+  const userTokenId = localStorage.getItem('userTokenId')
+  console.log('usertoken id', userTokenId)
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -76,6 +78,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
         companyName : formData.companyName,
         username: formData.username,
         password: formData.password,
+        userTokenId : userTokenId
       })
 
        console.log("Registration success:", res.data);

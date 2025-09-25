@@ -15,7 +15,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Navigate to="/register-company" replace />} />
       <Route path="/companies" element={<CompaniesPage />} />
       <Route path="/register-company" element={<CompanyRegistrationPage />} />
-      <Route path="/emailVerification" element={<EmailVerificationPage />} />
+      <Route path="/companies/auth/verify-email" element={<EmailVerificationPage />} />
       <Route path="/registrationForm" element={<RegistrationForm />} />
       {/* <Route path='/login' element={<LoginPage/>}/> */}
       <Route path="/invite-user" element={<InviteUser />} />

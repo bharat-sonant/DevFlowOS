@@ -1,5 +1,5 @@
 export const verificationTemplate = (token: string): string => {
-  const link = `${process.env.FRONTEND_URL}/verify?token=${token}`;
+  const link = `${process.env.FRONTEND_URL}/companies/auth/verify-email?token=${token}`;
   const companyName = `${process.env.COMPANY_NAME}`;
   return `
   <div style="font-family: Arial, sans-serif; background:#f6f9fc; padding:20px;">

@@ -1,58 +1,80 @@
-import { CompaniesControllerBase } from "./base/companies.controller.base";
-import { CompaniesService } from "./companies.service";
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { BadRequestException, Body, Controller, Get, Post, Query, Res } from "@nestjs/common";
-import { Response } from "express";
+import { CompaniesControllerBase } from './base/companies.controller.base';
+import { CompaniesService } from './companies.service';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { Public } from '../auth/public.decorator';
 
-@ApiBearerAuth('access-token') 
-@Controller("companies")
+@ApiBearerAuth('access-token')
+@Controller('companies')
 export class CompaniesController extends CompaniesControllerBase {
   constructor(protected readonly service: CompaniesService) {
     super(service);
   }
 
   // ✅ Add custom endpoints here
-  @Post("/auth/pre-register")
-  async preRegister (@Body("email") email: string){
-    const result = await this.service.preRegister(email);
-    if(!result){
-      throw new BadRequestException("Company could not be pre-registered.")
+  @Public()
+  @Post('pre-register')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'user@example.com' },
+      },
+      required: ['email'],
+    },
+  })
+  async preRegister(@Body() body: { email: string }) {
+    const result = await this.service.preRegister(body.email);
+    if (!result) {
+      throw new BadRequestException('Company could not be pre-registered.');
     }
     return result;
   }
 
   // ✅ Email verification endpoint (redirects to frontend)
-  @Get("/auth/verify-email")
+  @Public()
+  @Get('/auth/verify-email')
   async verifyEmail(
-    @Query("token") token: string,
-    @Query("email") email: string,
-    @Res() res: Response
+    @Query('token') token: string,
+    // @Query("email") email: string,
   ) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
 
-    if (!token || !email) {
-      return res.redirect(`${frontendUrl}/error?type=missing_params`);
+    if (!token) {
+      return { success: false, error: 'missing_params' };
     }
 
     try {
-       await this.service.verifyEmailToken(token, email);
-      return res.redirect(`${frontendUrl}/registrationForm?email=${encodeURIComponent(email)}&verified=true`);
-      
-    } catch (error : any) {
+      const verifiedData = await this.service.verifyEmailToken(token);
+       return {
+      success: true,
+      email: verifiedData.email,
+      tokenId: verifiedData.tokenId,
+    };
+    } catch (error: any) {
       // Error: Redirect to error page with specific error type
       let errorType = 'verification_failed';
       if (error.message.includes('expired')) {
         errorType = 'token_expired';
-      } else if (error.message.includes('invalid') || error.message.includes('malformed')) {
+      } else if (
+        error.message.includes('invalid') ||
+        error.message.includes('malformed')
+      ) {
         errorType = 'token_invalid';
-      } else if (error.message.includes('already used')){
+      } else if (error.message.includes('already used')) {
         errorType = 'token_used';
-      } else if (error.message.includes('not found')){
+      } else if (error.message.includes('not found')) {
         errorType = 'token_not_found';
       }
-      return res.redirect(`${frontendUrl}/error?type=${errorType}&email=${encodeURIComponent(email)}`);
+      return { success: false, error: errorType };
     }
   }
-
-
 }

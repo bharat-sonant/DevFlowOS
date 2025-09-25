@@ -9,6 +9,7 @@ const CompanyRegistrationPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "" });
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [loading, setLoading] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -20,12 +21,15 @@ const CompanyRegistrationPage = () => {
 
   const handleSubmit = async () => {
     try {
-      const result = await api.post("/auth/pre-register", formData.email);
+      setLoading(true)
+      const result = await api.post("/companies/pre-register", {email:formData.email});
       console.log("result of pre registration", result);
       setStatus("success");
     } catch (error) {
       console.log("error", error);
       setStatus("error");
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -109,11 +113,12 @@ const CompanyRegistrationPage = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 className="input"
+                disabled={loading}
               />
             </div>
 
-            <button onClick={handleSubmit} className="signup-btn">
-              SIGN UP
+            <button onClick={handleSubmit} disabled={loading} className="signup-btn">
+              {loading ? "Signing up..." : "Sign Up"}
             </button>
           </div>
         </div>

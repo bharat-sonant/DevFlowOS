@@ -45,6 +45,8 @@ export class AuthService {
       where: { id: userTokenId },
     });
 
+    console.log('tokennn', token)
+
     if (!token || token.is_verified || token.expires_at < new Date()) {
       throw new BadRequestException('Invalid or expired token');
     }
