@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, Post, Query, Req, Unauthori
 import { UsersControllerBase } from "./base/users.controller.base";
 import { UsersService } from "./users.service";
 import { Request } from 'express';
-import { InviteUserDto, ValidateInviteDto } from "@om/shared";
+import { CompleteRegistrationDto, InviteUserDto, ValidateInviteDto } from "@om/shared";
 import { ApiBearerAuth, ApiExtraModels, ApiQuery } from "@nestjs/swagger";
 
 @ApiBearerAuth('access-token')
@@ -38,10 +38,19 @@ export class UsersController extends UsersControllerBase {
     }
 
     return {
-      companyId: result.companyId,
       companyName: result.companyName,
       companyCode: result.companyCode,
       email: result.email,
     };
+  }
+
+  @Post('complete-registration')
+  async completeRegistration(@Req() req: Request, @Body() dto: CompleteRegistrationDto) {
+    const { sub: userId, companyId, isOwner } = req.user as any;
+    const result = await this.usersService.completeRegistration(dto, companyId);
+    if (!result) {
+      throw new BadRequestException('Invalid or expired token');
+    }
+    return result;
   }
 }
