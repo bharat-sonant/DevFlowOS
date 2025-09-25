@@ -14,6 +14,7 @@
     "db:pull:api": "dotenv -e apps/api/prisma/.env -- npx prisma db pull --schema=apps/api/prisma/schema.prisma",
     "start:web": "pnpm --filter web dev",
     "dev:mobile": "pnpm --filter mobile start",
+    "init:setup": "tsx scripts/prisma-merge-generate.ts",
     "start:api": "pnpm --filter api start",
     "build:api": "pnpm --filter @om/shared run build && pnpm --filter api build"
   },
@@ -43,6 +44,8 @@
     "@nestjs/mapped-types": "^2.1.0",
     "@react-native/normalize-colors": "^0.81.0",
     "change-case": "^5.4.4",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "fs-extra": "^11.3.1",
     "param-case": "^4.0.0",
     "postcss": "^8.5.6",
