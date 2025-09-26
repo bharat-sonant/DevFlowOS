@@ -10,11 +10,11 @@ export default function ProjectList() {
     displayName: "",
     description: "",
   });
+  const companyId = localStorage.getItem('companyId')
+
 
   async function getProjects() {
     try {
-      const token = localStorage.getItem("token");
-      const companyId = "";
       const response = await api.get("/projects", {
         params: {
           companyId,
