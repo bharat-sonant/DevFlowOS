@@ -20,6 +20,16 @@ export class TransformInterceptor<T> implements NestInterceptor<T, any> {
   return data; // already standard shape
 }
 
+  // If it's a plain object (like your service returns), spread it
+        if (data && typeof data === 'object' && !('data' in data)) {
+          return {
+            success: true,
+            ...data, // spread original object
+            timestamp: new Date().toISOString(),
+            path: req.url,
+          };
+        }
+
         // Otherwise wrap the raw response in the standard shape and add metadata.
         return {
           success: true,

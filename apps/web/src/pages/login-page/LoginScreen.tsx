@@ -39,7 +39,7 @@ const LoginScreen = () => {
       console.log('login result', res)
 
       if(res.data.success){
-        localStorage.setItem("token", res.data.data.token);
+        localStorage.setItem("token", res.data.token);
       navigate("/project");
       }
     } catch (err: any) {

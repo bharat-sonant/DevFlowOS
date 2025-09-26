@@ -16,7 +16,9 @@
     "dev:mobile": "pnpm --filter mobile start",
     "init:setup": "tsx scripts/prisma-merge-generate.ts",
     "start:api": "pnpm --filter api start",
-    "build:api": "pnpm --filter @om/shared run build && pnpm --filter api build"
+    "build:api": "pnpm --filter @om/shared run build && pnpm --filter api build",
+    "build:web" : "pnpm --filter @om/shared run build && pnpm --filter web build"
+
   },
   "devDependencies": {
     "@babel/runtime": "^7.28.3",
