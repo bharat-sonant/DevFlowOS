@@ -20,6 +20,8 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [loading, setLoading] = useState(false)
   const userTokenId = localStorage.getItem('userTokenId')
+  const [serverError, setServerError] = useState("");
+
   console.log('usertoken id', userTokenId)
 
   const handleInputChange = (
@@ -67,6 +69,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   };
 
   const handleSubmit = async(e: React.FormEvent) => {
+    console.log('usertokenid', userTokenId)
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       setConfirmPasswordError("Passwords do not match ❌");
@@ -83,9 +86,15 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
        console.log("Registration success:", res.data);
        navigate('/companycodescreen')
-    }catch(error){
-      console.log('error', error)
-    }
+    } catch (error: any) {
+      console.log('errrror', error)
+  if (error.response?.data?.error) {
+    setServerError(error.response.data.error);
+  } else {
+    setServerError("Something went wrong. Please try again.");
+  }
+}
+
     finally{
       setLoading(false)
     }
@@ -290,6 +299,11 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   </p>
 )}
 
+{serverError && (
+  <p style={{ color: "red", fontSize: "0.9rem", marginTop: "0.5rem" }}>
+    {serverError}
+  </p>
+)}
 
             {/* Sign Up Button */}
            <button

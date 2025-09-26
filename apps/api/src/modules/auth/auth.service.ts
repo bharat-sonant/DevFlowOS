@@ -39,6 +39,7 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     const { companyName, username, password, userTokenId } = dto;
+    console.log('usertokenid', userTokenId)
 
     // Step 1: validate token
     const token = await this.prisma.user_tokens.findUnique({
@@ -47,7 +48,7 @@ export class AuthService {
 
     console.log('tokennn', token)
 
-    if (!token || !token.is_verified || token.expires_at < new Date()) {
+    if (!token || token.is_verified || token.expires_at < new Date()) {
       throw new BadRequestException('Invalid or expired token');
     }
 
@@ -72,6 +73,7 @@ export class AuthService {
       );
     }
 
+    console.log('companycode', companyCode)
     // Step 3: hash password
     const passwordHash = await this.commonService.hashPassword(password);
 
@@ -85,6 +87,7 @@ export class AuthService {
             email: email,
           },
         });
+        console.log('company created')
 
         const u = await prisma.users.create({
           data: {
@@ -98,6 +101,7 @@ export class AuthService {
             updated_at: new Date(),
           },
         });
+        console.log('user created')
 
         await prisma.user_tokens.update({
           where: { id: userTokenId },
@@ -109,7 +113,9 @@ export class AuthService {
         });
 
         return [c, u];
-      },
+      }
+      ,
+      
       {
         timeout: 3600000,
       }
@@ -135,6 +141,7 @@ export class AuthService {
       };
     } catch (err: any) {
       if (err.code === 'P2002') {
+        console.log('errorrr', err)
         const target = err.meta?.target || [];
         if (target.includes('username')) {
           throw new ConflictException('Username already exists.');
@@ -142,6 +149,9 @@ export class AuthService {
         if (target.includes('name')) {
           throw new ConflictException('Company with this name already exists.');
         }
+         if (target.includes('email')) {
+    throw new ConflictException('A company with this email already exists.');
+  }
         throw new ConflictException('Duplicate data conflict');
       }
       this.logger.error('Registration failed', err);

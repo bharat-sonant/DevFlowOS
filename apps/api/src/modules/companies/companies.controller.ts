@@ -45,36 +45,7 @@ export class CompaniesController extends CompaniesControllerBase {
   @Get('/auth/verify-email')
   async verifyEmail(
     @Query('token') token: string,
-    // @Query("email") email: string,
   ) {
-
-    if (!token) {
-      return { success: false, error: 'missing_params' };
-    }
-
-    try {
-      const verifiedData = await this.service.verifyEmailToken(token);
-       return {
-      success: true,
-      email: verifiedData.email,
-      tokenId: verifiedData.tokenId,
-    };
-    } catch (error: any) {
-      // Error: Redirect to error page with specific error type
-      let errorType = 'verification_failed';
-      if (error.message.includes('expired')) {
-        errorType = 'token_expired';
-      } else if (
-        error.message.includes('invalid') ||
-        error.message.includes('malformed')
-      ) {
-        errorType = 'token_invalid';
-      } else if (error.message.includes('already used')) {
-        errorType = 'token_used';
-      } else if (error.message.includes('not found')) {
-        errorType = 'token_not_found';
-      }
-      return { success: false, error: errorType };
+      return await this.service.verifyEmailToken(token)
     }
   }
-}

@@ -13,16 +13,12 @@ export class TransformInterceptor<T> implements NestInterceptor<T, any> {
 
     return next.handle().pipe(
       map((data) => {
+        console.log('DATA', data)
         // If the handler already returned the standard response shape,
         // return it unchanged (avoid double-wrapping).
-        if (
-          data &&
-          typeof data === 'object' &&
-          Object.prototype.hasOwnProperty.call(data, 'success') &&
-          Object.prototype.hasOwnProperty.call(data, 'data')
-        ) {
-          return data;
-        }
+        if (data && typeof data === 'object' && 'success' in data) {
+  return data; // already standard shape
+}
 
         // Otherwise wrap the raw response in the standard shape and add metadata.
         return {
