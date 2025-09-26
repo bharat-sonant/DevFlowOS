@@ -1,0 +1,14 @@
+# Ignore local/dev stuff
+node_modules
+dist
+.vscode
+.idea
+.DS_Store
+.env
+.env.*.local
+coverage
+*.log
+
+# Ignore build outputs of other packages
+apps/*/dist
+packages/*/dist
