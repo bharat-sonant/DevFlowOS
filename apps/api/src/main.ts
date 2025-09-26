@@ -36,7 +36,9 @@ async function bootstrap() {
   const swaggerPath = 'api/docs';
   SwaggerModule.setup(swaggerPath, app, document);
 
-  await app.listen(3000);
+  const port = Number(process.env.PORT) || 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`Listening on port ${port}`);
 
   // Auto-open browser on Swagger docs
   await open(`http://localhost:3000/${swaggerPath}`);
