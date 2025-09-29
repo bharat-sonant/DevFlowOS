@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
 import "./LoginScreen.css";
@@ -13,6 +13,21 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const companyId = localStorage.getItem('companyId')
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+  const savedUsername = localStorage.getItem("username");
+  const savedPassword = localStorage.getItem("password");
+
+  if (savedUsername && savedPassword) {
+    setFormData({
+      username: savedUsername,
+      password: savedPassword,
+    });
+    setRememberMe(true);
+  }
+}, []);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,6 +55,13 @@ const LoginScreen = () => {
 
       if(res.data.success){
         localStorage.setItem("token", res.data.token);
+        if (rememberMe) {
+    localStorage.setItem("username", formData.username);
+    localStorage.setItem("password", formData.password);
+  } else {
+    localStorage.removeItem("username");
+    localStorage.removeItem("password");
+  }
       navigate("/project");
       }
     } catch (err: any) {
@@ -139,6 +161,17 @@ const LoginScreen = () => {
                 </span>
               </div>
             </div>
+            <div className="login-remember-container">
+  <input
+    type="checkbox"
+    id="rememberMe"
+    checked={rememberMe}
+    onChange={(e) => setRememberMe(e.target.checked)}
+    disabled={loading}
+  />
+  <label htmlFor="rememberMe">Remember me</label>
+</div>
+
 
           {error && <div className="login-error">{error}</div>}
 

@@ -3,7 +3,7 @@ import "../invite-user/RegistrationFlow.css";
 import { api } from "../../services/api";
 
 interface FormData {
-  companyCode: string;
+  companyId: string;
   fullName: string;
   username: string;
   password: string;
@@ -12,61 +12,30 @@ interface FormData {
 const RegistrationFlow: React.FC = () => {
   const [step, setStep] = useState<number>(1);
   const [showPassword, setShowPassword] = useState(false);
-  const [isValidating, setIsValidating] = useState<boolean>(true);
   const [tokenValid, setTokenValid] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+  const [token, setToken] = useState<string>("");
+
   const [formData, setFormData] = useState<FormData>({
-    companyCode: "ABC123",
+    companyId: "N271QG",
     fullName: "",
     username: "",
     password: "",
   });
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
+    const tokenFromUrl = localStorage.getItem('tokenFromUrl');
+console.log('token from url', tokenFromUrl)
+    if (!tokenFromUrl) {
+  setError("Invalid or missing invitation token");
+  return;
+}
 
-    if (!token) {
-      setError("Invalid or missing invitation token");
-      setIsValidating(false);
-      return;
-    }
-
-    validateToken(token);
+setToken(tokenFromUrl);
   }, []);
 
-  const validateToken = async (token: string) => {
-    try {
-      setIsValidating(true);
-
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/validate-token', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ token })
-      // });
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const mockData = {
-        valid: true,
-        companyCode: "COMP-12345",
-      };
-
-      if (mockData.valid) {
-        setFormData((prev) => ({ ...prev, companyCode: mockData.companyCode }));
-        setTokenValid(true);
-      } else {
-        setError("Invalid or expired invitation token");
-      }
-    } catch (err) {
-      setError("Failed to validate token. Please try again.");
-    } finally {
-      setIsValidating(false);
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -105,45 +74,40 @@ const RegistrationFlow: React.FC = () => {
     }
 
     const payload = {
-      companyCode: formData.companyCode,
+      token,
+      companyId: formData.companyId,
       username: formData.username,
       password: formData.password,
+      fullName : formData.fullName
     };
+
+    console.log('payload', payload)
     try {
       setLoading(true);
       setError("");
 
-      const result = api.post("/users/complete-registration", payload);
+      const result = await api.post("/users/complete-registration", payload);
 
-      //       if(result.success){
-      localStorage.setItem("companyCode", formData.companyCode);
-      localStorage.setItem("isOwner", "No");
-      //       setSuccess('Registration completed successfully! Redirecting to dashboard...');
-      // setTimeout(() => {
-      //         // TODO: Store auth token and redirect
-      //         // window.location.href = '/dashboard';
-      //         console.log('Redirecting to dashboard...');
-      //       }, 2000);
-      //       }
-    } catch (err) {
-      setError("Registration failed. Please try again.");
+      console.log('complete registration' , result)
+
+      // if (result?.success) {
+      //   setSuccess("Registration completed successfully! Redirecting...");
+      //   localStorage.setItem("companyId", formData.companyId);
+      //   localStorage.setItem("isOwner", result.data.user.isOwner ? "Yes" : "No");
+
+      //   setTimeout(() => {
+      //     // e.g. redirect to login or dashboard
+      //     window.location.href = "/dashboard";
+      //   }, 2000);
+      // }
+    } catch (err:any) {
+      setError(err.response?.data.error || "error");
     } finally {
       setLoading(false);
     }
   };
 
-  if (isValidating) {
-    return (
-      <div className="registration-container">
-        <div className="registration-card">
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Validating invitation...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+
 
   // if (!tokenValid) {
   //   return (
@@ -210,7 +174,7 @@ const RegistrationFlow: React.FC = () => {
                 type="text"
                 id="companyCode"
                 name="companyCode"
-                value={formData.companyCode}
+                value={formData.companyId}
                 disabled
                 className="form-input disabled"
               />

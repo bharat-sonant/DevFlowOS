@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
 import "../login-page/CompanyCodeScreen.css";
@@ -10,6 +10,16 @@ const CompanyCodeScreen = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const companyCode = localStorage.getItem("companyCode");
+  
+    if (companyCode ) {
+      setFormData({
+        companyCode : companyCode
+      });
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

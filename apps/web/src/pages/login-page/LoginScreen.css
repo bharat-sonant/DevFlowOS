@@ -270,6 +270,24 @@ body, html {
   border-radius: 8px;
 }
 
+.login-remember-container {
+  display: flex;
+  align-items: center;
+  /* margin: 2px 0; */
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.login-remember-container input {
+  cursor: pointer;
+}
+
+.login-remember-container label {
+  cursor: pointer;
+}
+
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .login-container {
