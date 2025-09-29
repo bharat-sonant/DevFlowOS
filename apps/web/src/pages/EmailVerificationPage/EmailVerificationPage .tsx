@@ -8,18 +8,8 @@ const EmailVerificationPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [status, setStatus] = useState<"loading" | "error">("loading");
-  const [errorType, setErrorType] = useState<string | null>(null);
+   const [errorMessage, setErrorMessage] = useState("");
 
-  // Map backend error types to friendly messages
-  const errorMessages: Record<string, string> = {
-    token_used: "This verification link has already been used. Please request a new one.",
-    token_expired: "This verification link has expired. Please request a new one.",
-    token_invalid: "This verification link is invalid.",
-    token_not_found: "The verification token was not found.",
-    missing_params: "Missing verification token in the URL.",
-    network_error: "Network error occurred while verifying your email. Please try again.",
-    verification_failed: "Email verification failed due to an unknown reason.",
-  };
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -27,32 +17,30 @@ const EmailVerificationPage: React.FC = () => {
     console.log('token on frontend', token);
 
     if (!token) {
+      setErrorMessage("Missing verification token in the URL.");
       setStatus("error");
-      setErrorType("missing_params");
       return;
     }
 
     const verifyEmail = async () => {
-      try {
-        console.log('api hit started');
-        const response = await api.get(`/companies/auth/verify-email?token=${encodeURIComponent(token)}`);
-        console.log('frontend verify', response);
-        const data = response.data;
+     try {
+  const response = await api.get(`/companies/auth/verify-email?token=${token}`);
+console.log(response, 'verify')
+  if (response.data.success) {
+    // success path
+    localStorage.setItem('userTokenId', response.data.tokenId)
+    navigate(`/registrationForm?email=${response.data.email}&verified=true`);
+  } else {
+    // backend provided error
+    setErrorMessage(response.data.error || "Email verification failed.");
+    setStatus("error");
+  }
+} catch (err: any) {
+  // network or unhandled errors
+  setErrorMessage(err.message || "Network error occurred.");
+  setStatus("error");
+}
 
-        if (data.data.email) {
-          localStorage.setItem('userTokenId', data.data.tokenId)
-          // Navigate to registration form with email & verified
-          navigate(`/registrationForm?email=${encodeURIComponent(data.data.email)}&verified=true`);
-        } else {
-          // Show friendly error
-          setErrorType(data.error || "verification_failed");
-          setStatus("error");
-        }
-      } catch (err) {
-        console.error("Email verification failed:", err);
-        setErrorType("network_error");
-        setStatus("error");
-      }
     };
 
     verifyEmail();
@@ -72,7 +60,7 @@ const EmailVerificationPage: React.FC = () => {
   return (
     <ErrorPage
       title="Email Verification Failed"
-      message={errorType ? errorMessages[errorType] || "An unknown error occurred." : ""}
+      message={errorMessage}
       email=""
       steps={[
         "Check if you already verified your email",

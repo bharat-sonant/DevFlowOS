@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
 import "../company-registration/CompanyRegistration.css";
-import ErrorPage from "../../components/common/ErrorPage/ErrorPage";
 import SuccessPage from "../../components/common/SuccessPage/SuccessPage";
 
 const CompanyRegistrationPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "" });
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -17,24 +17,35 @@ const CompanyRegistrationPage = () => {
       ...prev,
       [name]: value,
     }));
+    // Clear error as soon as user starts typing
+  if (error) {
+    setError("");
+  }
   };
 
-  const handleSubmit = async () => {
-    if(!formData.email){
-      return;
-    }
-    try {
-      setLoading(true)
-      const result = await api.post("/companies/pre-register", {email:formData.email});
-      console.log("result of pre registration", result);
-      setStatus("success");
-    } catch (error) {
-      console.log("error", error);
-      setStatus("error");
-    }finally{
-      setLoading(false)
-    }
-  };
+const handleSubmit = async () => {
+  if (!formData.email) return;
+
+  try {
+    setLoading(true);
+    setError("");
+
+    await api.post("/companies/pre-register", { email: formData.email });
+
+    // Success – show success page
+    setStatus("success");
+  } catch (error: any) {
+    console.log("error", error);
+
+    const message =
+      error.response?.data?.error || "Something went wrong. Please try again.";
+
+    setError(message); // This will show below the button
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (status === "success") {
     return (
@@ -47,23 +58,6 @@ const CompanyRegistrationPage = () => {
           "Don't forget to check your spam folder",
         ]}
         actionText="Back to Signup"
-        onAction={() => setStatus("idle")}
-      />
-    );
-  }
-
-  if (status === "error") {
-    return (
-      <ErrorPage
-        title="Failed to Send Email"
-        message="There was an error sending the verification email to"
-        email={formData.email}
-        steps={[
-          "Check your internet connection",
-          "Verify your email address is correct",
-          "Contact support if the problem persists",
-        ]}
-        actionText="Try Again"
         onAction={() => setStatus("idle")}
       />
     );
@@ -120,7 +114,23 @@ const CompanyRegistrationPage = () => {
               />
             </div>
 
-            <button onClick={handleSubmit} disabled={loading} className="signup-btn">
+            {error && (
+              
+              <p
+                style={{
+                  color: "red",
+                  fontSize: "0.9rem",
+                }}
+              >
+                {error}
+              </p>
+            )}
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="signup-btn"
+            >
               {loading ? "Signing up..." : "Sign Up"}
             </button>
           </div>
