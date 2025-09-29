@@ -129,6 +129,10 @@ export default function ProjectList() {
     }
   };
 
+  const handleEditProject = () => {
+    setIsModalOpen(true);
+  }
+
   return (
     <>
       <div className="project-list-container">
@@ -164,7 +168,7 @@ export default function ProjectList() {
                     </span>
                   </td>
                   <td className="actions">
-                    <button className="btn edit">Edit</button>
+                    <button className="btn edit" onClick={handleEditProject}>Edit</button>
                     <button className="btn delete" onClick={() => setDeleteModalOpen(true)}>{isDeleted === false ? 'Delete' : 'Restore'}</button>
                   </td>
                 </tr>
