@@ -128,12 +128,32 @@ const handleSubmit = async () => {
 
             <button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || !formData.email}
               className="signup-btn"
             >
               {loading ? "Signing up..." : "Sign Up"}
             </button>
+            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+    <span style={{ fontSize: '0.9rem', color: '#555' }}>
+      Already have an account?{' '}
+      <button
+        onClick={() => navigate('/companycodescreen')}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: '#1a73e8',
+          cursor: 'pointer',
+          textDecoration: 'underline',
+          padding: 0,
+          fontSize: '0.9rem'
+        }}
+      >
+        Login
+      </button>
+    </span>
+  </div>
           </div>
+          
         </div>
       </div>
     </div>

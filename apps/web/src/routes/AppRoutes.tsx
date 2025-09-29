@@ -12,7 +12,7 @@ import ProjectList from "../pages/Project/ProjectList";
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/register-company" replace />} />
+      <Route path="/" element={<Navigate to="/companycodescreen" replace />} />
       <Route path="/companies" element={<CompaniesPage />} />
       <Route path="/register-company" element={<CompanyRegistrationPage />} />
       <Route path="/companies/auth/verify-email" element={<EmailVerificationPage />} />
