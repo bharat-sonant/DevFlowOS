@@ -45,6 +45,7 @@ const CompanyCodeScreen = () => {
       
       if (result.data?.success) {
         localStorage.setItem("companyId", result?.data?.companyId);
+        localStorage.setItem("companyCode", formData.companyCode)
         navigate("/login");
       } else {
         setError("❌ Invalid company code");

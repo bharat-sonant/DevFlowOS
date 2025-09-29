@@ -8,6 +8,7 @@ import InviteUser from "../pages/invite-user/InviteUser";
 import CompanyCodeScreen from "../pages/login-page/CompanyCodeScreen";
 import LoginScreen from "../pages/login-page/LoginScreen";
 import ProjectList from "../pages/Project/ProjectList";
+import RegistrationFlow from "../pages/invite-user/RegistrationFlow";
 
 const AppRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const AppRoutes = () => {
       <Route path="/companycodescreen" element={<CompanyCodeScreen />} />
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/project" element={<ProjectList />} />
+      <Route path="invited-user-registration-flow" element={<RegistrationFlow/>}/>
     </Routes>
   );
 };
