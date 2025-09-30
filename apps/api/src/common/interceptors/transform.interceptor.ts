@@ -13,7 +13,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, any> {
 
     return next.handle().pipe(
       map((data) => {
-        console.log('DATA', data)
+        // console.log('DATA', data)
         // If the handler already returned the standard response shape,
         // return it unchanged (avoid double-wrapping).
         if (data && typeof data === 'object' && 'success' in data) {

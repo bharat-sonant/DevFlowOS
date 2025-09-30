@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../services/api";
 import "../login-page/CompanyCodeScreen.css";
@@ -10,6 +10,16 @@ const CompanyCodeScreen = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const companyCode = localStorage.getItem("companyCode");
+  
+    if (companyCode ) {
+      setFormData({
+        companyCode : companyCode
+      });
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,6 +55,7 @@ const CompanyCodeScreen = () => {
       
       if (result.data?.success) {
         localStorage.setItem("companyId", result?.data?.companyId);
+        localStorage.setItem("companyCode", formData.companyCode)
         navigate("/login");
       } else {
         setError("❌ Invalid company code");
@@ -118,7 +129,7 @@ const CompanyCodeScreen = () => {
                 placeholder="Company Code (e.g., COMP123)"
                 value={formData.companyCode}
                 onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 className="company-code-input"
                 disabled={loading}
                 maxLength={10}
@@ -137,7 +148,25 @@ const CompanyCodeScreen = () => {
             >
               {loading ? "Validating..." : "Continue"}
             </button>
-
+ <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+    <span style={{ fontSize: '0.9rem', color: '#555' }}>
+      Don't have an account?{' '}
+      <button
+        onClick={() => navigate('/register-company')}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: '#1a73e8',
+          cursor: 'pointer',
+          textDecoration: 'underline',
+          padding: 0,
+          fontSize: '0.9rem'
+        }}
+      >
+        Sign Up
+      </button>
+    </span>
+  </div>
           </div>
 
           <div style={{ 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "../Project/projectList.css";
 import { api } from "../../services/api";
+import ConfirmModal from "../../shared/ConfirmModal";
 
 export default function ProjectList() {
   const [projects, setProjects] = useState([]);
@@ -10,8 +11,54 @@ export default function ProjectList() {
     displayName: "",
     description: "",
   });
-  const companyId = localStorage.getItem('companyId')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
 
+  const projectList = [
+    {
+      id: "uuid-1",
+      prefix: "ALP", // Alpha → ALP
+      displayName: "Alpha",
+      status: true,
+      description: 'This is for test'
+
+    },
+    {
+      id: "uuid-2",
+      prefix: "BET", // Beta → BET
+      displayName: "Beta",
+      status: true,
+      description: 'This is for test'
+
+    },
+    {
+      id: "uuid-3",
+      prefix: "GAM", // Gamma → GAM
+      displayName: "Gamma",
+      status: true,
+      description: 'This is for test'
+
+    },
+    {
+      id: "uuid-4",
+      prefix: "DEL", // Delta → DEL
+      displayName: "Delta",
+      status: true,
+      description: 'This is for test'
+
+    },
+    {
+      id: "uuid-5",
+      prefix: "EPI", // Epsilon → EPI
+      displayName: "Epsilon",
+      status: true,
+      description: 'This is for test'
+
+    },
+  ];
+
+  const companyId = localStorage.getItem('companyId');
 
   async function getProjects() {
     try {
@@ -57,6 +104,35 @@ export default function ProjectList() {
     }
   };
 
+  const handleDelete = async () => {
+    setDeleteLoader(true);
+    setIsDeleted(true);
+    try {
+      const response = await api.delete("/projects", {
+        params: {
+          //parameters
+        },
+      });
+
+      if (response) {
+        setDeleteModalOpen(false);
+      } else {
+        setDeleteModalOpen(false);
+      }
+    } catch (error) {
+      console.log(error, "Error while deleting project !!!");
+    } finally {
+      setTimeout(() => {
+        setDeleteLoader(false);
+        setDeleteModalOpen(false);
+      }, 1000)
+    }
+  };
+
+  const handleEditProject = () => {
+    setIsModalOpen(true);
+  }
+
   return (
     <>
       <div className="project-list-container">
@@ -78,24 +154,22 @@ export default function ProjectList() {
             </tr>
           </thead>
           <tbody>
-            {projects.length > 0 ? (
-              projects.map((proj, index) => (
+            {projectList.length > 0 ? (
+              projectList.map((proj, index) => (
                 <tr key={index}>
                   <td>{proj.prefix}</td>
                   <td>{proj.displayName}</td>
                   <td>{proj.description}</td>
                   <td>
                     <span
-                      className={`status ${proj.status
-                        .toLowerCase()
-                        .replace(" ", "")}`}
+                      className={`status ${proj.status}`}
                     >
-                      {proj.status}
+                      {proj.status === true ? 'Active' : 'InActive'}
                     </span>
                   </td>
                   <td className="actions">
-                    <button className="btn edit">Edit</button>
-                    <button className="btn delete">Delete</button>
+                    <button className="btn edit" onClick={handleEditProject}>Edit</button>
+                    <button className="btn delete" onClick={() => setDeleteModalOpen(true)}>{isDeleted === false ? 'Delete' : 'Restore'}</button>
                   </td>
                 </tr>
               ))
@@ -158,6 +232,17 @@ export default function ProjectList() {
             </form>
           </div>
         </div>
+      )}
+      {deleteModalOpen && (
+        <ConfirmModal
+          title="Delete project !!!"
+          message="Are you sure you want to delete this project?"
+          onConfirm={handleDelete}
+          onCancel={() => [setDeleteModalOpen(false), setDeleteLoader(false), setIsDeleted(false)]}
+          confirmText="Confirm"
+          cancelText="Cancel"
+          loading={deleteLoader}
+        />
       )}
     </>
   );
