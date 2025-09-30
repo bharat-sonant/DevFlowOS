@@ -28,7 +28,10 @@ const ValidateUser: React.FC = () => {
 console.log(response, 'verify')
   if (response.data.success) {
     // success path
-    localStorage.setItem('userTokenId', response.data.tokenId)
+    // localStorage.setItem('userTokenId', response.data.tokenId)
+    localStorage.setItem('companyCode',response.data.companyCode)
+     localStorage.setItem('companyName',response.data.companyName)
+     localStorage.setItem('companyId', response.data.companyId)
     localStorage.setItem('tokenFromUrl', token)
     navigate(`/invited-user-registration-flow?email=${response.data.email}&verified=true`);
   } else {

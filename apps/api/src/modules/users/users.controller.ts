@@ -23,10 +23,11 @@ export class UsersController extends UsersControllerBase {
     return this.usersService.inviteUser(dto.email, companyId, userId);
   }
 
+  @Public()
   @Get('validate-invite')
   @ApiQuery({ name: 'token', type: String, required: true })
   async validateInvite(@Query('token') token: string) {
-    console.log('query.token: ', token);
+    // console.log('query.token: ', token);
 
     if (!token) {
       throw new BadRequestException('Token is required!');
@@ -42,14 +43,18 @@ export class UsersController extends UsersControllerBase {
       companyName: result.companyName,
       companyCode: result.companyCode,
       email: result.email,
+      companyId : result.companyId
     };
   }
 
   @Public()
   @Post('complete-registration')
-  async completeRegistration(@Req() req: Request, @Body() dto: CompleteRegistrationDto) {
-    const { sub: userId, companyId, isOwner } = req.user as any;
-    const result = await this.usersService.completeRegistration(dto, companyId);
+  async completeRegistration(@Body() dto: CompleteRegistrationDto) {
+    // const { sub: userId, companyId, isOwner } = req.user as any;
+    // console.log('dto',dto)
+    // console.log('company id', companyId)
+
+      const result = await this.usersService.completeRegistration(dto, dto.companyId);
     if (!result) {
       throw new BadRequestException('Invalid or expired token');
     }

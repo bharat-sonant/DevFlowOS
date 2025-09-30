@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../invite-user/RegistrationFlow.css";
 import { api } from "../../services/api";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   companyId: string;
@@ -17,24 +18,28 @@ const RegistrationFlow: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [token, setToken] = useState<string>("");
-
+  const companyCode = localStorage.getItem('companyCode');
+const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
-    companyId: "N271QG",
+    companyId: "",
     fullName: "",
     username: "",
     password: "",
   });
 
   useEffect(() => {
-    const tokenFromUrl = localStorage.getItem('tokenFromUrl');
-console.log('token from url', tokenFromUrl)
-    if (!tokenFromUrl) {
-  setError("Invalid or missing invitation token");
-  return;
-}
+  const storedCompanyId = localStorage.getItem("companyId");
+  const storedToken = localStorage.getItem("tokenFromUrl"); // or whatever key you saved token with
 
-setToken(tokenFromUrl);
-  }, []);
+  if (storedCompanyId) {
+    setFormData((prev) => ({ ...prev, companyId: storedCompanyId }));
+  }
+
+  if (storedToken) {
+    setToken(storedToken);
+  }
+}, []);
+
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,10 +80,10 @@ setToken(tokenFromUrl);
 
     const payload = {
       token,
-      companyId: formData.companyId,
       username: formData.username,
       password: formData.password,
-      fullName : formData.fullName
+      fullName : formData.fullName,
+      companyId: formData.companyId,
     };
 
     console.log('payload', payload)
@@ -90,16 +95,11 @@ setToken(tokenFromUrl);
 
       console.log('complete registration' , result)
 
-      // if (result?.success) {
-      //   setSuccess("Registration completed successfully! Redirecting...");
-      //   localStorage.setItem("companyId", formData.companyId);
-      //   localStorage.setItem("isOwner", result.data.user.isOwner ? "Yes" : "No");
-
-      //   setTimeout(() => {
-      //     // e.g. redirect to login or dashboard
-      //     window.location.href = "/dashboard";
-      //   }, 2000);
-      // }
+     if(result.data.success){
+      // localStorage.setItem('username', result.data.user.username)
+      localStorage.setItem('token', result.data.token)
+      navigate("/project");
+     }
     } catch (err:any) {
       setError(err.response?.data.error || "error");
     } finally {
@@ -174,7 +174,7 @@ setToken(tokenFromUrl);
                 type="text"
                 id="companyCode"
                 name="companyCode"
-                value={formData.companyId}
+                value={companyCode ?? ""}
                 disabled
                 className="form-input disabled"
               />
