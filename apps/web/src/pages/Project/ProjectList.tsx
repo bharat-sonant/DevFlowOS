@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import "../Project/projectList.css";
 import { api } from "../../services/api";
 import ConfirmModal from "../../shared/ConfirmModal";
+import AddProject from "./AddProject";
 
 export default function ProjectList() {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<any[]>([]);;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     prefix: "",
@@ -14,6 +15,7 @@ export default function ProjectList() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteLoader, setDeleteLoader] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [isSaving, setIssaving] = useState(false)
 
   const projectList = [
     {
@@ -78,32 +80,12 @@ export default function ProjectList() {
     getProjects();
   }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "prefix" ? value.toUpperCase().slice(0, 6) : value,
-    }));
+  const handleSaveProject = (project: any) => {
+    // push new project locally
+    // setProjects((prev) => [project, ...prev]);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const result = await api.post("/projects", formData);
-      console.log("result", result);
-      setIsModalOpen(false);
-      setFormData({ prefix: "", displayName: "", description: "" });
-      getProjects();
-    } catch (error) {
-      console.log("error", error);
-      alert(error);
-    }
-  };
-
+ 
   const handleDelete = async () => {
     setDeleteLoader(true);
     setIsDeleted(true);
@@ -188,50 +170,10 @@ export default function ProjectList() {
       </div>
       {/* Modal */}
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Add Project</h3>
-            <form onSubmit={handleSubmit} className="modal-form">
-              <input
-                type="text"
-                name="prefix"
-                placeholder="Prefix (max 6 chars)"
-                value={formData.prefix}
-                onChange={handleChange}
-                maxLength={6}
-                required
-              />
-              <input
-                type="text"
-                name="displayName"
-                placeholder="Project Name"
-                value={formData.displayName}
-                onChange={handleChange}
-                maxLength={100}
-                required
-              />
-              <textarea
-                name="description"
-                placeholder="Description (optional)"
-                value={formData.description}
-                onChange={handleChange}
-                maxLength={2000}
-              />
-              <div className="modal-actions">
-                <button type="submit" className="btn save">
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className="btn cancel"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+       <AddProject
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveProject}
+        />
       )}
       {deleteModalOpen && (
         <ConfirmModal
