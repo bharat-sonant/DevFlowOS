@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ProjectsControllerBase } from './base/projects.controller.base';
 import { ProjectsService } from './projects.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { CreateProjectsDto, UpdateProjectsDto } from '@om/shared';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { CreateProjectsDto, ProjectStatusAction, UpdateProjectsDto } from '@om/shared';
 
 @ApiBearerAuth('access-token')
 @Controller('projects')
@@ -51,5 +51,21 @@ export class ProjectsController extends ProjectsControllerBase {
     const result = await this.projectService.updateProject(id, dto, companyId, userId)
 
     return result;
+  }
+
+  @Patch(':id/status')
+  @ApiBody({ schema: { type: 'object', properties: { action: { type: 'string', enum: Object.values(ProjectStatusAction) } } } })
+  async updateProjectStatus(@Param('id') id:string, @Body() body: any, @Req() req:any){
+    const action = body.action;
+     if (!Object.values(ProjectStatusAction).includes(action)) {
+      throw new BadRequestException("Invalid action type");
+    }
+
+    const companyId = req.user.companyId;
+    const userId = req.user.sub;
+
+    const result = await this.projectService.updateProjectStatus(id, companyId, userId, action);
+
+    return { success: true, data: result };
   }
 }
