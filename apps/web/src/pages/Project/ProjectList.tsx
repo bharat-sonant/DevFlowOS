@@ -27,7 +27,6 @@ export default function ProjectList() {
           includeDeleted: false,
         },
       });
-      console.log(response,"eelll")
       setProjects(response.data.data);
     } catch (error) {
       console.log(error, "Error while fetching projects !!");
