@@ -4,6 +4,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 console.log("API URL 👉", API_URL); 
 
 // const API_URL = "http://localhost:3000"; 
+
+if (!API_URL) {
+  throw new Error("VITE_API_URL is not defined!"); // ensures you never fallback
+}
 export const api = axios.create({
   baseURL: API_URL,
   withCredentials: false,
