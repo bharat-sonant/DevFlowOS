@@ -2,19 +2,18 @@ import React, { useState } from "react";
 import { api } from "../../services/api";
 import "../Project/AddProject.css";
 
-// Project type define
 export interface Project {
+  id?: string;
   prefix: string;
-  displayName: string;
+  name: string;
   description?: string;
 }
 
-// Props type
 interface ProjectFormProps {
-  initialData?: Project; // Edit karte time data
-  onClose: () => void; // Modal close karne ka function
-  onSave: (project: Project) => void; // Project save hone ke baad callback
-  setProjects: React.Dispatch<React.SetStateAction<Project[]>>; // Parent ka setProjects
+  initialData?: Project; 
+  onClose: () => void;
+  onSave: (project: Project) => void;
+  setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({
@@ -25,13 +24,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<Project>({
     prefix: initialData?.prefix || "",
-    displayName: initialData?.displayName || "",
+    name: initialData?.name || "",
     description: initialData?.description || "",
   });
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Input change handler
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -42,7 +40,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     }));
   };
 
-  // Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -50,31 +47,42 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     try {
       const payload = {
         prefix: formData.prefix,
-        name: formData.displayName,
+        name: formData.name,
         description: formData.description,
       };
 
-      const result = await api.post("/projects", payload);
+      let result;
+
+      if (initialData?.id) {
+        result = await api.put(`/projects/${initialData.id}`, payload);
+      } else {
+        result = await api.post("/projects", payload);
+      }
+
       const newProject: Project = {
+        id: result.data.data.id,
         prefix: result.data.data.prefix,
-        displayName: result.data.data.name,
+        name: result.data.data.name,
         description: result.data.data.description,
       };
 
-      // Parent ko notify karo
       onSave(newProject);
-
-      // Projects array update karo
-      setProjects((prev) => [...prev, newProject]);
+      setProjects((prev) => {
+        if (initialData?.id) {
+          return prev.map((p) => (p.id === newProject.id ? newProject : p));
+        }
+        return [...prev, newProject];
+      });
 
       onClose();
     } catch (error) {
-      console.error("Error creating project:", error);
+      console.error("Error saving project:", error);
       alert("Failed to save project.");
     } finally {
       setIsSaving(false);
     }
   };
+
 
   return (
     <div className="modal-overlay">
@@ -114,7 +122,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               type="text"
               name="displayName"
               placeholder="Enter project name"
-              value={formData.displayName}
+              value={formData.name}
               onChange={handleChange}
               maxLength={100}
               required

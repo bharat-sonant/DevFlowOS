@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "../Project/projectList.css";
 import { api } from "../../services/api";
 import ConfirmModal from "../../shared/ConfirmModal";
-import AddProject from "./AddProject";
+import AddProject, { Project } from "./AddProject";
 
 export default function ProjectList() {
   const [projects, setProjects] = useState<any[]>([]);;
@@ -15,7 +15,7 @@ export default function ProjectList() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteLoader, setDeleteLoader] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
-  const [isSaving, setIssaving] = useState(false)
+  const [editProjectList, setEditProjectList] = useState<Project | null>(null);;
 
   const companyId = localStorage.getItem('companyId');
 
@@ -68,7 +68,8 @@ export default function ProjectList() {
     }
   };
 
-  const handleEditProject = () => {
+  const handleEditProject = (project: Project) => {
+    setEditProjectList(project)
     setIsModalOpen(true);
   }
 
@@ -107,7 +108,7 @@ export default function ProjectList() {
                     </span>
                   </td>
                   <td className="actions">
-                    <button className="btn edit" onClick={handleEditProject}>Edit</button>
+                    <button className="btn edit" onClick={() => handleEditProject(proj)}>Edit</button>
                     <button className="btn delete" onClick={() => setDeleteModalOpen(true)}>{isDeleted === false ? 'Delete' : 'Restore'}</button>
                   </td>
                 </tr>
@@ -128,6 +129,7 @@ export default function ProjectList() {
       {/* Modal */}
       {isModalOpen && (
         <AddProject
+          initialData={editProjectList ?? undefined}
           onClose={() => setIsModalOpen(false)}
           onSave={handleSaveProject}
           setProjects={setProjects}
