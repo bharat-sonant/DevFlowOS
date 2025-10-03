@@ -73,6 +73,21 @@ export default function ProjectList() {
     setIsModalOpen(true);
   }
 
+  const handleToggleStatus = async (projectId: string, currentStatus: boolean) => {
+    try {
+      // await api.patch(`/projects/${projectId}/status`, { is_active: !currentStatus });
+
+      // Update locally
+      setProjects((prev) =>
+        prev.map((proj) =>
+          proj.id === projectId ? { ...proj, is_active: !currentStatus } : proj
+        )
+      );
+    } catch (error) {
+      console.log(error, "Error while updating project status!");
+    }
+  };
+
   return (
     <>
       <div className="project-list-container">
@@ -105,7 +120,7 @@ export default function ProjectList() {
                       <input
                         type="checkbox"
                         checked={proj.is_active === true}
-                      // onChange={() => handleToggleStatus(proj.id, proj.status)}
+                        onChange={() => handleToggleStatus(proj.id, proj.is_active)}
                       />
                       <span className="slider round"></span>
                     </label>
