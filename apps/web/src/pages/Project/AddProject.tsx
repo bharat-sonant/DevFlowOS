@@ -7,10 +7,11 @@ export interface Project {
   prefix: string;
   name: string;
   description?: string;
+  is_active?: boolean;
 }
 
 interface ProjectFormProps {
-  initialData?: Project; 
+  initialData?: Project;
   onClose: () => void;
   onSave: (project: Project) => void;
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
@@ -49,12 +50,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         prefix: formData.prefix,
         name: formData.name,
         description: formData.description,
+        is_active: initialData?.is_active ?? true,
       };
 
       let result;
 
       if (initialData?.id) {
-        result = await api.put(`/projects/${initialData.id}`, payload);
+        result = await api.patch(`/projects/${initialData.id}`, payload);
       } else {
         result = await api.post("/projects", payload);
       }
@@ -64,6 +66,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         prefix: result.data.data.prefix,
         name: result.data.data.name,
         description: result.data.data.description,
+        is_active: result.data.data.is_active
       };
 
       onSave(newProject);

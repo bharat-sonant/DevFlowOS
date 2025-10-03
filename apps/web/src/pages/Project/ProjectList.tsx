@@ -16,6 +16,7 @@ export default function ProjectList() {
   const [deleteLoader, setDeleteLoader] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [editProjectList, setEditProjectList] = useState<Project | null>(null);;
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
 
   const companyId = localStorage.getItem('companyId');
 
@@ -42,18 +43,22 @@ export default function ProjectList() {
     // setProjects((prev) => [project, ...prev]);
   };
 
+  const openDeleteModal = (id: string) => {
+    setProjectToDelete(id);
+    setDeleteModalOpen(true)
+  }
+
 
   const handleDelete = async () => {
     setDeleteLoader(true);
     setIsDeleted(true);
     try {
-      const response = await api.delete("/projects", {
-        params: {
-          //parameters
-        },
+      const response = await api.delete(`/projects/${projectToDelete}/status`, {
+        data: { action: 'DELETE' }
       });
 
-      if (response) {
+      if (response.status === 200) {
+        setProjects((prev) => prev.filter((p) => p.id !== projectToDelete));
         setDeleteModalOpen(false);
       } else {
         setDeleteModalOpen(false);
@@ -75,9 +80,9 @@ export default function ProjectList() {
 
   const handleToggleStatus = async (projectId: string, currentStatus: boolean) => {
     try {
-      // await api.patch(`/projects/${projectId}/status`, { is_active: !currentStatus });
+      const action = currentStatus ? 'DEACTIVATE' : 'ACTIVATE';
 
-      // Update locally
+      await api.patch(`/projects/${projectId}/status`, { action });
       setProjects((prev) =>
         prev.map((proj) =>
           proj.id === projectId ? { ...proj, is_active: !currentStatus } : proj
@@ -127,7 +132,7 @@ export default function ProjectList() {
                   </td>
                   <td className="actions">
                     <button className="btn edit" onClick={() => handleEditProject(proj)}>Edit</button>
-                    <button className="btn delete" onClick={() => setDeleteModalOpen(true)}>{isDeleted === false ? 'Delete' : 'Restore'}</button>
+                    <button className="btn delete" onClick={() => openDeleteModal(proj.id)}>{isDeleted === false ? 'Delete' : 'Restore'}</button>
                   </td>
                 </tr>
               ))
