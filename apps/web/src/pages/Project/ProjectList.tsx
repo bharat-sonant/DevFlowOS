@@ -17,49 +17,6 @@ export default function ProjectList() {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isSaving, setIssaving] = useState(false)
 
-  const projectList = [
-    {
-      id: "uuid-1",
-      prefix: "ALP", // Alpha → ALP
-      displayName: "Alpha",
-      status: true,
-      description: 'This is for test'
-
-    },
-    {
-      id: "uuid-2",
-      prefix: "BET", // Beta → BET
-      displayName: "Beta",
-      status: true,
-      description: 'This is for test'
-
-    },
-    {
-      id: "uuid-3",
-      prefix: "GAM", // Gamma → GAM
-      displayName: "Gamma",
-      status: true,
-      description: 'This is for test'
-
-    },
-    {
-      id: "uuid-4",
-      prefix: "DEL", // Delta → DEL
-      displayName: "Delta",
-      status: true,
-      description: 'This is for test'
-
-    },
-    {
-      id: "uuid-5",
-      prefix: "EPI", // Epsilon → EPI
-      displayName: "Epsilon",
-      status: true,
-      description: 'This is for test'
-
-    },
-  ];
-
   const companyId = localStorage.getItem('companyId');
 
   async function getProjects() {
@@ -70,7 +27,7 @@ export default function ProjectList() {
           includeDeleted: false,
         },
       });
-      setProjects(response.data);
+      setProjects(response.data.data);
     } catch (error) {
       console.log(error, "Error while fetching projects !!");
     }
@@ -85,7 +42,7 @@ export default function ProjectList() {
     // setProjects((prev) => [project, ...prev]);
   };
 
- 
+
   const handleDelete = async () => {
     setDeleteLoader(true);
     setIsDeleted(true);
@@ -136,11 +93,11 @@ export default function ProjectList() {
             </tr>
           </thead>
           <tbody>
-            {projectList.length > 0 ? (
-              projectList.map((proj, index) => (
+            {projects.length > 0 ? (
+              projects.map((proj, index) => (
                 <tr key={index}>
                   <td>{proj.prefix}</td>
-                  <td>{proj.displayName}</td>
+                  <td>{proj.name ? proj.name : proj.displayName}</td>
                   <td>{proj.description}</td>
                   <td>
                     <span
@@ -170,9 +127,10 @@ export default function ProjectList() {
       </div>
       {/* Modal */}
       {isModalOpen && (
-       <AddProject
+        <AddProject
           onClose={() => setIsModalOpen(false)}
           onSave={handleSaveProject}
+          setProjects={setProjects}
         />
       )}
       {deleteModalOpen && (

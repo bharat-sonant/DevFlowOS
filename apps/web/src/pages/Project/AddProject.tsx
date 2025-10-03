@@ -2,24 +2,36 @@ import React, { useState } from "react";
 import { api } from "../../services/api";
 import "../Project/AddProject.css";
 
-interface ProjectFormProps {
-  initialData?: {
-    prefix: string;
-    displayName: string;
-    description?: string;
-  };
-  onClose: () => void;
-  onSave: (project: any) => void;
+// Project type define
+export interface Project {
+  prefix: string;
+  displayName: string;
+  description?: string;
 }
 
-const ProjectForm = ({ initialData, onClose, onSave }: ProjectFormProps) => {
-  const [formData, setFormData] = useState({
+// Props type
+interface ProjectFormProps {
+  initialData?: Project; // Edit karte time data
+  onClose: () => void; // Modal close karne ka function
+  onSave: (project: Project) => void; // Project save hone ke baad callback
+  setProjects: React.Dispatch<React.SetStateAction<Project[]>>; // Parent ka setProjects
+}
+
+const ProjectForm: React.FC<ProjectFormProps> = ({
+  initialData,
+  onClose,
+  onSave,
+  setProjects,
+}) => {
+  const [formData, setFormData] = useState<Project>({
     prefix: initialData?.prefix || "",
     displayName: initialData?.displayName || "",
     description: initialData?.description || "",
   });
+
   const [isSaving, setIsSaving] = useState(false);
 
+  // Input change handler
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -30,6 +42,7 @@ const ProjectForm = ({ initialData, onClose, onSave }: ProjectFormProps) => {
     }));
   };
 
+  // Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -42,12 +55,21 @@ const ProjectForm = ({ initialData, onClose, onSave }: ProjectFormProps) => {
       };
 
       const result = await api.post("/projects", payload);
-      console.log("result", result);
-      const newProject = result.data.data;
+      const newProject: Project = {
+        prefix: result.data.data.prefix,
+        displayName: result.data.data.name,
+        description: result.data.data.description,
+      };
+
+      // Parent ko notify karo
       onSave(newProject);
+
+      // Projects array update karo
+      setProjects((prev) => [...prev, newProject]);
+
       onClose();
     } catch (error) {
-      console.log("Error creating project:", error);
+      console.error("Error creating project:", error);
       alert("Failed to save project.");
     } finally {
       setIsSaving(false);
@@ -62,6 +84,7 @@ const ProjectForm = ({ initialData, onClose, onSave }: ProjectFormProps) => {
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
+          {/* Prefix */}
           <div className="form-group">
             <label htmlFor="prefix">
               Project Prefix <span className="required">*</span>
@@ -81,6 +104,7 @@ const ProjectForm = ({ initialData, onClose, onSave }: ProjectFormProps) => {
             </span>
           </div>
 
+          {/* Display Name */}
           <div className="form-group">
             <label htmlFor="displayName">
               Project Name <span className="required">*</span>
@@ -97,6 +121,7 @@ const ProjectForm = ({ initialData, onClose, onSave }: ProjectFormProps) => {
             />
           </div>
 
+          {/* Description */}
           <div className="form-group">
             <label htmlFor="description">Description</label>
             <textarea
@@ -110,17 +135,10 @@ const ProjectForm = ({ initialData, onClose, onSave }: ProjectFormProps) => {
             />
           </div>
 
+          {/* Actions */}
           <div className="modal-actions">
-            <button
-              type="submit"
-              className="btn btn-save"
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                  "Saving..."
-              ) : (
-                "Save Project"
-              )}
+            <button type="submit" className="btn btn-save" disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save Project"}
             </button>
             <button
               type="button"
