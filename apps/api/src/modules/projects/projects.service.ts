@@ -88,11 +88,15 @@ export class ProjectsService extends ProjectsServiceBase {
       throw new NotFoundException('Project not found.');
     }
 
+    console.log('dto', dto)
+
+    // Only check duplicates if prefix or name is provided
+  if (dto.prefix || dto.name) {
     const existing = await this.prisma.projects.findFirst({
       where: {
         company_id: companyId,
-        prefix: dto.prefix,
-        name: dto.name,
+        ...(dto.prefix && { prefix: dto.prefix }),
+        ...(dto.name && { name: dto.name }),
         NOT: { id: id },
       },
     });
@@ -102,17 +106,19 @@ export class ProjectsService extends ProjectsServiceBase {
         'Another project with this prefix and name already exists in your company.',
       );
     }
+  }
 
-    const updated = await this.prisma.projects.update({
-      where: { id },
-      data: {
-        prefix: dto.prefix,
-        name: dto.name,
-        description: dto.description,
-        updated_by: userId,
-      },
-    });
 
+    // Only update fields provided
+  const updated = await this.prisma.projects.update({
+    where: { id },
+    data: {
+      ...(dto.prefix && { prefix: dto.prefix }),
+      ...(dto.name && { name: dto.name }),
+      ...(dto.description && { description: dto.description }),
+      updated_by: userId,
+    },
+  });
     return {
       success: true,
       data: { ...updated, displayName: `${updated.prefix}-${updated.name}` },

@@ -43,7 +43,7 @@ export class ProjectsController extends ProjectsControllerBase {
     };
   }
 
-  @Put(':id')
+  @Patch(':id')
   async updateProject(@Param('id') id:string, @Body() dto: UpdateProjectsDto, @Req() req:any){
     const companyId = req.user.companyId;
     const userId = req.user.sub;
