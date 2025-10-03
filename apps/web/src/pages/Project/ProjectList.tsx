@@ -27,6 +27,7 @@ export default function ProjectList() {
           includeDeleted: false,
         },
       });
+      console.log(response,"eelll")
       setProjects(response.data.data);
     } catch (error) {
       console.log(error, "Error while fetching projects !!");
@@ -101,11 +102,14 @@ export default function ProjectList() {
                   <td>{proj.name ? proj.name : proj.displayName}</td>
                   <td>{proj.description}</td>
                   <td>
-                    <span
-                      className={`status ${proj.status}`}
-                    >
-                      {proj.status === true ? 'Active' : 'InActive'}
-                    </span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={proj.is_active === true}
+                        // onChange={() => handleToggleStatus(proj.id, proj.status)}
+                      />
+                      <span className="slider round"></span>
+                    </label>
                   </td>
                   <td className="actions">
                     <button className="btn edit" onClick={() => handleEditProject(proj)}>Edit</button>
