@@ -7,17 +7,11 @@ import AddProject, { Project } from "./AddProject";
 export default function ProjectList() {
   const [projects, setProjects] = useState<any[]>([]);;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    prefix: "",
-    displayName: "",
-    description: "",
-  });
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteLoader, setDeleteLoader] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
   const [editProjectList, setEditProjectList] = useState<Project | null>(null);;
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
-
+  const [includeDeleted, setIncludeDeleted] = useState(false);
   const companyId = localStorage.getItem('companyId');
 
   async function getProjects() {
@@ -25,7 +19,7 @@ export default function ProjectList() {
       const response = await api.get("/projects", {
         params: {
           companyId,
-          includeDeleted: false,
+          includeDeleted,
         },
       });
       setProjects(response.data.data);
@@ -36,7 +30,7 @@ export default function ProjectList() {
 
   useEffect(() => {
     getProjects();
-  }, []);
+  }, [includeDeleted]);
 
   const handleSaveProject = (project: any) => {
     // push new project locally
@@ -48,17 +42,25 @@ export default function ProjectList() {
     setDeleteModalOpen(true)
   }
 
-
   const handleDelete = async () => {
     setDeleteLoader(true);
-    setIsDeleted(true);
     try {
-      const response = await api.delete(`/projects/${projectToDelete}/status`, {
-        data: { action: 'DELETE' }
+      const response = await api.patch(`/projects/${projectToDelete}/status`, {
+        action: 'DELETE'
       });
 
       if (response.status === 200) {
-        setProjects((prev) => prev.filter((p) => p.id !== projectToDelete));
+        setProjects((prev) => {
+          if (includeDeleted) {
+            return prev.map((p) =>
+              p.id === projectToDelete
+                ? { ...p, is_deleted: true, is_active: false }
+                : p
+            );
+          } else {
+            return prev.filter((p) => p.id !== projectToDelete);
+          }
+        });
         setDeleteModalOpen(false);
       } else {
         setDeleteModalOpen(false);
@@ -69,9 +71,10 @@ export default function ProjectList() {
       setTimeout(() => {
         setDeleteLoader(false);
         setDeleteModalOpen(false);
-      }, 1000)
+      }, 1000);
     }
   };
+
 
   const handleEditProject = (project: Project) => {
     setEditProjectList(project)
@@ -93,14 +96,43 @@ export default function ProjectList() {
     }
   };
 
+  const handleRestore = async (projectId: string) => {
+    try {
+      const response = await api.patch(`/projects/${projectId}/status`, {
+        action: "RESTORE",
+      });
+
+      if (response.status === 200) {
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === projectId ? { ...p, is_deleted: false, is_active: true } : p
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error, "Error while restoring project!");
+    }
+  };
+
   return (
     <>
       <div className="project-list-container">
         <div className="header">
           <h2>Projects</h2>
-          <button className="add-btn" onClick={() => setIsModalOpen(true)}>
-            + Add Project
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              <input
+                type="checkbox"
+                checked={includeDeleted}
+                onChange={(e) => setIncludeDeleted(e.target.checked)}
+              />
+              Include deleted
+            </label>
+            <button className="add-btn" onClick={() => setIsModalOpen(true)}>
+              + Add Project
+            </button>
+          </div>
+
         </div>
 
         <table className="project-table">
@@ -116,14 +148,15 @@ export default function ProjectList() {
           <tbody>
             {projects.length > 0 ? (
               projects.map((proj, index) => (
-                <tr key={index}>
+                <tr key={index} className={proj.is_deleted ? "deleted-row" : ""}>
                   <td>{proj.prefix}</td>
-                  <td>{proj.name ? proj.name : proj.displayName}</td>
+                  <td>{proj.name ?? proj.displayName}</td>
                   <td>{proj.description}</td>
                   <td>
                     <label className="switch">
                       <input
                         type="checkbox"
+                        disabled={proj.is_deleted}
                         checked={proj.is_active === true}
                         onChange={() => handleToggleStatus(proj.id, proj.is_active)}
                       />
@@ -131,10 +164,17 @@ export default function ProjectList() {
                     </label>
                   </td>
                   <td className="actions">
-                    <button className="btn edit" onClick={() => handleEditProject(proj)}>Edit</button>
-                    <button className="btn delete" onClick={() => openDeleteModal(proj.id)}>{isDeleted === false ? 'Delete' : 'Restore'}</button>
+                    {!proj.is_deleted ? (
+                      <>
+                        <button className="btn edit" onClick={() => handleEditProject(proj)}>Edit</button>
+                        <button className="btn delete" onClick={() => openDeleteModal(proj.id)}>Delete</button>
+                      </>
+                    ) : (
+                      <button className="btn restore" onClick={() => handleRestore(proj.id)}>Restore</button>
+                    )}
                   </td>
                 </tr>
+
               ))
             ) : (
               <tr>
@@ -163,7 +203,7 @@ export default function ProjectList() {
           title="Delete project !!!"
           message="Are you sure you want to delete this project?"
           onConfirm={handleDelete}
-          onCancel={() => [setDeleteModalOpen(false), setDeleteLoader(false), setIsDeleted(false)]}
+          onCancel={() => [setDeleteModalOpen(false), setDeleteLoader(false)]}
           confirmText="Confirm"
           cancelText="Cancel"
           loading={deleteLoader}

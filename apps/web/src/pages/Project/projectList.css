@@ -241,3 +241,19 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(26px);
 }
+
+.deleted-row {
+  color: #888;
+  background-color: #f9f9f9;
+  text-decoration: line-through;
+}
+
+.btn.restore {
+  background: #c8eed0;
+  color: rgb(39, 32, 32);
+}
+
+.btn.restore:hover {
+  background: #c8ee9d;
+}
+
