@@ -12,9 +12,11 @@ export default function ProjectList() {
   const [editProjectList, setEditProjectList] = useState<Project | null>(null);;
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [includeDeleted, setIncludeDeleted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const companyId = localStorage.getItem('companyId');
 
   async function getProjects() {
+    setLoading(true);
     try {
       const response = await api.get("/projects", {
         params: {
@@ -25,6 +27,8 @@ export default function ProjectList() {
       setProjects(response.data.data);
     } catch (error) {
       console.log(error, "Error while fetching projects !!");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -134,60 +138,65 @@ export default function ProjectList() {
           </div>
 
         </div>
-
-        <table className="project-table">
-          <thead>
-            <tr>
-              <th>Prefix</th>
-              <th>Project Name</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th style={{ textAlign: "center" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.length > 0 ? (
-              projects.map((proj, index) => (
-                <tr key={index} className={proj.is_deleted ? "deleted-row" : ""}>
-                  <td>{proj.prefix}</td>
-                  <td>{proj.name ?? proj.displayName}</td>
-                  <td>{proj.description}</td>
-                  <td>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        disabled={proj.is_deleted}
-                        checked={proj.is_active === true}
-                        onChange={() => handleToggleStatus(proj.id, proj.is_active)}
-                      />
-                      <span className="slider round"></span>
-                    </label>
-                  </td>
-                  <td className="actions">
-                    {!proj.is_deleted ? (
-                      <>
-                        <button className="btn edit" onClick={() => handleEditProject(proj)}>Edit</button>
-                        <button className="btn delete" onClick={() => openDeleteModal(proj.id)}>Delete</button>
-                      </>
-                    ) : (
-                      <button className="btn restore" onClick={() => handleRestore(proj.id)}>Restore</button>
-                    )}
-                  </td>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <div className="loader"></div>
+            <div>Please wait...</div>
+          </div>
+        ) : (
+          <div className="project-table-container">
+            <table className="project-table">
+              <thead>
+                <tr>
+                  <th>Prefix</th>
+                  <th>Project Name</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: "center" }}>Actions</th>
                 </tr>
+              </thead>
+              <tbody>
+                {projects.length > 0 ? (
+                  projects.map((proj, index) => (
+                    <tr key={index} className={proj.is_deleted ? "deleted-row" : ""}>
+                      <td>{proj.prefix}</td>
+                      <td>{proj.name ?? proj.displayName}</td>
+                      <td>{proj.description}</td>
+                      <td>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            disabled={proj.is_deleted}
+                            checked={proj.is_active === true}
+                            onChange={() => handleToggleStatus(proj.id, proj.is_active)}
+                          />
+                          <span className="slider round"></span>
+                        </label>
+                      </td>
+                      <td className="actions">
+                        {!proj.is_deleted ? (
+                          <>
+                            <button className="btn edit" onClick={() => handleEditProject(proj)}>Edit</button>
+                            <button className="btn delete" onClick={() => openDeleteModal(proj.id)}>Delete</button>
+                          </>
+                        ) : (
+                          <button className="btn restore" onClick={() => handleRestore(proj.id)}>Restore</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: "center", padding: "15px" }}>
+                      No project available !!
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={5}
-                  style={{ textAlign: "center", padding: "15px" }}
-                >
-                  No project available !!
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
       </div>
       {/* Modal */}
       {isModalOpen && (
