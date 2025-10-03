@@ -118,9 +118,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               Project Name <span className="required">*</span>
             </label>
             <input
-              id="displayName"
+              id="name"
               type="text"
-              name="displayName"
+              name="name"
               placeholder="Enter project name"
               value={formData.name}
               onChange={handleChange}

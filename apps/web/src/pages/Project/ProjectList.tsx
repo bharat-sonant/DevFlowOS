@@ -105,7 +105,7 @@ export default function ProjectList() {
                       <input
                         type="checkbox"
                         checked={proj.is_active === true}
-                        // onChange={() => handleToggleStatus(proj.id, proj.status)}
+                      // onChange={() => handleToggleStatus(proj.id, proj.status)}
                       />
                       <span className="slider round"></span>
                     </label>
@@ -133,7 +133,7 @@ export default function ProjectList() {
       {isModalOpen && (
         <AddProject
           initialData={editProjectList ?? undefined}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => { setIsModalOpen(false), setEditProjectList(null) }}
           onSave={handleSaveProject}
           setProjects={setProjects}
         />
