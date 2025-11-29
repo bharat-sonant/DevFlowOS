@@ -1,23 +1,29 @@
 {
   "name": "task-management",
   "private": true,
+  "prisma": {
+    "schema": "apps/api/prisma/schema/"
+  },
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",
     "prisma": "prisma",
-    "generate:api": "setx PRISMA_CLIENT_ENGINE_TYPE binary && dotenv -e apps/api/prisma/.env -- npx prisma db pull --schema ./apps/api/prisma/schema.prisma && prisma generate --schema ./apps/api/prisma/schema.prisma && tsx scripts/split-prisma.ts && tsx scripts/generate-modules.ts && ts-node --compiler-options \"{\\\"module\\\":\\\"CommonJS\\\"}\" scripts/generate-response-dtos.ts && tsx scripts/cleanup-dtos.ts && prettier --write \"packages/shared/src/models/**/*.{ts,tsx}\"",
-    "db:pull:api": "setx PRISMA_CLIENT_ENGINE_TYPE binary && dotenv -e apps/api/prisma/.env -- npx prisma db pull --schema=apps/api/prisma/schema.prisma",
-    "dev:web": "pnpm --filter web dev",
+    "generate:api": "tsx scripts/cleanup-schemas.ts && dotenv -e apps/api/prisma/schema/.env -- npx prisma db pull --schema ./apps/api/prisma/schema/schema.prisma && prisma generate --schema ./apps/api/prisma/schema/schema.prisma && tsx scripts/split-prisma.ts && tsx scripts/generate-modules.ts && ts-node --compiler-options \"{\\\"module\\\":\\\"CommonJS\\\"}\" scripts/generate-response-dtos.ts && tsx scripts/cleanup-dtos.ts && prettier --write \"packages/shared/src/models/**/*.{ts,tsx}\"",
+    "db:pull:api": "dotenv -e apps/api/prisma/.env -- npx prisma db pull --schema=apps/api/prisma/schema.prisma",
+    "start:web": "pnpm --filter web dev",
     "dev:mobile": "pnpm --filter mobile start",
+    "init:setup": "tsx scripts/prisma-merge-generate.ts",
     "start:api": "pnpm --filter api start",
-    "build:api": "pnpm --filter api build"
+    "build:api": "pnpm --filter @om/shared run build && pnpm --filter api build",
+    "build:web" : "pnpm --filter @om/shared run build && pnpm --filter web build"
+
   },
   "devDependencies": {
     "@babel/runtime": "^7.28.3",
     "@brakebein/prisma-generator-nestjs-dto": "^1.28.1",
-    "@prisma/client": "^6.15.0",
+    "@prisma/client": "^6.16.1",
     "@types/fs-extra": "^11.0.4",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
@@ -25,8 +31,9 @@
     "css-in-js-utils": "^3.1.0",
     "dotenv-cli": "^10.0.0",
     "inline-style-prefixer": "^7.0.1",
+    "open": "^8.4.2",
     "prettier": "^3.6.2",
-    "prisma": "^6.15.0",
+    "prisma": "^6.16.1",
     "prisma-generator-nestjs-dto": "^1.1.4",
     "prisma-merge": "^0.2.0",
     "styleq": "^0.2.1",
@@ -39,6 +46,8 @@
     "@nestjs/mapped-types": "^2.1.0",
     "@react-native/normalize-colors": "^0.81.0",
     "change-case": "^5.4.4",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "fs-extra": "^11.3.1",
     "param-case": "^4.0.0",
     "postcss": "^8.5.6",

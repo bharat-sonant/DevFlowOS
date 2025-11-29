@@ -8,7 +8,9 @@ export class CompaniesServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
 
   async create(data: CreateCompaniesDto): Promise<CompaniesResponseDto> {
-    const created = await this.prisma.companies.create({ data });
+    const prismaData: any = { ...data };
+    
+    const created = await this.prisma.companies.create({ data: prismaData });
     return created as unknown as CompaniesResponseDto;
   }
 
@@ -21,7 +23,9 @@ export class CompaniesServiceBase {
   }
 
   async update(id: string, data: UpdateCompaniesDto): Promise<CompaniesResponseDto> {
-    return this.prisma.companies.update({ where: { id }, data }) as unknown as CompaniesResponseDto;
+    const prismaData: any = { ...data };
+    
+    return this.prisma.companies.update({ where: { id }, data: prismaData }) as unknown as CompaniesResponseDto;
   }
 
   async remove(id: string): Promise<CompaniesResponseDto> {

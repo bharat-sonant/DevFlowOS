@@ -3,13 +3,11 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "clean": "rm -rf dist",
-    "lint": "eslint src --ext .ts",
-    "format": "prettier --write src"
-  },
-  "dependencies": {
-    "@om/shared": "workspace:*"
+    "clean": "rimraf dist",
+    "build": "tsc -p tsconfig.json"
   }
 }
